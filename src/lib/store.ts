@@ -10,7 +10,7 @@ import type { Capsule, Entry, Memory } from "../types";
  */
 export const ADMIN_PIN = "Oyisam21";
 
-const KEY = "senandika.v4";
+const KEY = "senandika.v5";
 const THEME_KEY = "senandika.theme";
 const ADMIN_KEY = "senandika.admin";
 
