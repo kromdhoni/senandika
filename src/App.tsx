@@ -91,7 +91,6 @@ export default function App() {
   const [draft, setDraft] = useState<Entry>(emptyDraft);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [query, setQuery] = useState("");
-  const [filterRecipient, setFilterRecipient] = useState<Recipient | "Semua">("Semua");
   const [theme, setThemeState] = useState<"light" | "dark">(getTheme());
   const [admin, setAdmin] = useState(isAdmin());
   const [immersive, setImmersive] = useState(false);
@@ -130,7 +129,6 @@ export default function App() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return entries
-      .filter((e) => (filterRecipient === "Semua" ? true : e.recipient === filterRecipient))
       .filter((e) => {
         if (!q) return true;
         return [e.title, e.content, e.recipient, e.mood, e.tags.join(" ")]
@@ -139,7 +137,7 @@ export default function App() {
           .includes(q);
       })
       .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
-  }, [entries, query, filterRecipient]);
+  }, [entries, query]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { Ayah: 0, Ibu: 0, Diriku: 0 };
@@ -519,17 +517,6 @@ export default function App() {
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Pencarian tulisan"
             />
-            <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Filter penerima">
-              {(["Semua", ...RECIPIENTS] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setFilterRecipient(r)}
-                  className={`rounded-full border px-3 py-1 text-sm ${filterRecipient === r ? "font-semibold underline underline-offset-4" : "opacity-70"}`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
             <div className="stagger mt-6 grid gap-3">
               {(view === "favorit" ? favList : filtered).map((e, i) => (
                 <article key={e.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
@@ -974,7 +961,6 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       <input
         className="input mt-4 max-w-xs"
         type="password"
-        inputMode="numeric"
         autoComplete="off"
         placeholder="Masukkan PIN admin"
         value={pin}
