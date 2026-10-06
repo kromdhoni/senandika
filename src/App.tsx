@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ENTRY_TYPES,
-  ENTRY_TYPE_LABELS,
   RECIPIENTS,
   type Capsule,
   type Entry,
@@ -28,12 +27,12 @@ import {
 } from "./lib/store";
 
 const TYPE_COVER: Record<EntryType, string> = {
-  LETTER: "linear-gradient(120deg, #7d9069, #b08762)",
-  JOURNAL: "linear-gradient(120deg, #b08762, #7d9069)",
-  MEMORY: "linear-gradient(120deg, #7d9069, #4c5b43)",
-  PRAYER: "linear-gradient(120deg, #b08762, #d9b48f)",
-  POEM: "linear-gradient(120deg, #8c7770, #b08762)",
-  NOTE: "linear-gradient(120deg, #b4aba0, #7d9069)",
+  LETTER: "linear-gradient(120deg, #2e86c1, #1a5276)",
+  JOURNAL: "linear-gradient(120deg, #5dade2, #2e86c1)",
+  MEMORY: "linear-gradient(120deg, #1a5276, #0e3a53)",
+  PRAYER: "linear-gradient(120deg, #85c1e9, #2e86c1)",
+  POEM: "linear-gradient(120deg, #2e86c1, #7fb3d5)",
+  NOTE: "linear-gradient(120deg, #a9cce3, #5499c7)",
 };
 
 function todayLocal() {
@@ -302,15 +301,11 @@ export default function App() {
           </span>
         </div>
         <article key={active.id} className="fade-in mx-auto max-w-2xl px-5 pb-20 pt-4">
-          <p className="flex flex-wrap items-center justify-center gap-2 text-center text-xs uppercase tracking-widest opacity-60">
-            {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient}
-          </p>
           <h1 className="font-display mt-3 text-center text-4xl font-medium md:text-5xl">
             {active.title || "Tanpa judul"}
           </h1>
           <p className="mt-3 text-center text-sm opacity-60">
             {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-            {active.tags.length > 0 && ` · ${active.tags.join(" · ")}`}
           </p>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
           <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
@@ -348,7 +343,7 @@ export default function App() {
               <button
                 key={n.id}
                 onClick={() => setView(n.id)}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.18em] ${view === n.id ? "font-semibold underline underline-offset-8" : "opacity-70 hover:opacity-100"}`}
+                className={`font-display rounded-full px-4 py-2 text-[13px] uppercase tracking-[0.2em] ${view === n.id ? "font-semibold underline underline-offset-8" : "opacity-70 hover:opacity-100"}`}
               >
                 {n.label}
               </button>
@@ -386,12 +381,11 @@ export default function App() {
           <section className="fade-in mx-auto max-w-5xl py-10 md:py-16">
             <div className="grid items-center gap-10 md:grid-cols-2">
               <div className="text-center md:text-left">
-                <p className="eyebrow">Ruang personal · privat · tenang</p>
                 <h1 className="font-display mt-4 text-4xl font-medium md:text-6xl">
                   Ada kata yang belum sempat <span className="accent-word">terucap.</span>
                 </h1>
                 <p className="mx-auto mt-5 max-w-xl text-lg opacity-80 md:mx-0">
-                  Senandika adalah rumah bagi surat, kenangan, dan doa — ditulis dengan tenang, disimpan dengan kasih.
+                  Senandika adalah rumah bagi surat, kenangan, dan doa. Ditulis dengan tenang, disimpan dengan kasih.
                 </p>
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:justify-start sm:justify-center">
                   <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca →</button>
@@ -445,9 +439,6 @@ export default function App() {
                 <span className="mt-2 block text-sm opacity-70">
                   {entries[0].content.slice(0, 140)}{entries[0].content.length > 140 ? "…" : ""}
                 </span>
-                <span className="mt-4 flex items-center gap-2">
-                  <span className="text-xs opacity-60">Untuk {entries[0].recipient}</span>
-                </span>
               </button>
             )}
 
@@ -480,9 +471,8 @@ export default function App() {
                   onClick={() => openEntry(entries[0].id)}
                 >
                   <span className="font-display text-2xl">“{entries[0].title || "Tanpa judul"}”</span>
-                  <span className="mt-2 flex flex-wrap items-center gap-2 text-sm opacity-70">
+                  <span className="mt-2 block text-sm opacity-70">
                     {new Date(entries[0].updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                    <span>· Untuk {entries[0].recipient}</span>
                   </span>
                 </button>
               ) : (
@@ -542,9 +532,6 @@ export default function App() {
                   <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
                   <div className="p-5">
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
-                    <span className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-                      {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient}
-                    </span>
                     <span className="font-display mt-1 block text-xl">{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, 120)}{e.content.length > 120 ? "…" : ""}</span>
                   </button>
@@ -611,7 +598,7 @@ export default function App() {
             />
             {draft.type === "POEM" && (
               <details className="card mt-3 p-5 text-sm">
-                <summary className="font-display cursor-pointer text-lg">{GAYA_PUISI.judul} — referensi gayamu</summary>
+                <summary className="font-display cursor-pointer text-lg">{GAYA_PUISI.judul} · referensi gayamu</summary>
                 <p className="mt-2 opacity-75">{GAYA_PUISI.ringkasan}</p>
                 <ul className="mt-3 list-disc space-y-1 pl-5 opacity-85">
                   {GAYA_PUISI.ciri.map((c) => <li key={c}>{c}</li>)}
@@ -644,13 +631,9 @@ export default function App() {
 
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
-            <p className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-              {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient}
-            </p>
             <h2 className="font-display mt-2 text-4xl font-medium md:text-5xl">{active.title || "Tanpa judul"}</h2>
             <p className="mt-3 text-sm opacity-60">
               {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-              {active.tags.length > 0 && ` · ${active.tags.join(" · ")}`}
             </p>
             <div className="divider-orn my-6" aria-hidden="true"><span>✦</span></div>
             <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
@@ -788,7 +771,7 @@ export default function App() {
             <div className="prose-read mt-6 space-y-4 text-[1rem] opacity-85">
               <p>
                 Senandika adalah ruang personal untuk menulis surat, menyimpan kenangan,
-                dan mengabadikan kata-kata yang ingin disampaikan kepada orang-orang tercinta —
+                dan mengabadikan kata-kata yang ingin disampaikan kepada orang-orang tercinta,
                 bahkan yang tak sempat dikatakan.
               </p>
               <p>
@@ -799,7 +782,7 @@ export default function App() {
             <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
             <h3 className="font-display text-2xl">Cara membaca</h3>
             <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm opacity-85">
-              <li>Buka <strong>Senandika</strong> untuk menjelajah semua tulisan, atau <strong>Timeline</strong> untuk menelusuri per waktu.</li>
+              <li>Buka <strong>Koleksi</strong> untuk menjelajah semua tulisan, atau <strong>Timeline</strong> untuk menelusuri per waktu.</li>
               <li>Ketuk tulisan untuk membaca dengan tenang. Tombol <strong>Layar penuh</strong> menyembunyikan semuanya kecuali kata-katanya.</li>
               <li>Tombol <strong>Bagikan</strong> menyalin tautan yang langsung membuka tulisan itu.</li>
               <li>Tandai favorit untuk menyimpan yang paling berarti di perambanmu.</li>
@@ -850,7 +833,7 @@ export default function App() {
             <div className="card mt-4 p-6">
               <h3 className="font-semibold">Tema</h3>
               <button onClick={() => setThemeState(theme === "dark" ? "light" : "dark")} className="btn-ghost mt-2 text-sm">
-                Saat ini: {theme === "dark" ? "Gelap" : "Terang"} — alihkan
+                Saat ini: {theme === "dark" ? "Gelap" : "Terang"} · alihkan
               </button>
             </div>
             <div className="card mt-4 p-6">
@@ -1029,7 +1012,7 @@ function SharePanel({ entry, url, icon }: { entry: Entry; url: string; icon?: bo
   const [copied, setCopied] = useState(false);
   const title = entry.title || "Tanpa judul";
   const excerpt = entry.content.split("\n").slice(0, 4).join("\n");
-  const text = `“${title}” — Senandika\n\n${excerpt}\n\nBaca selengkapnya: ${url}`;
+  const text = `“${title}” · Senandika\n\n${excerpt}\n\nBaca selengkapnya: ${url}`;
 
   async function nativeShare() {
     const nav = navigator as Navigator & {
@@ -1037,7 +1020,7 @@ function SharePanel({ entry, url, icon }: { entry: Entry; url: string; icon?: bo
     };
     if (nav.share) {
       try {
-        await nav.share({ title: `${title} — Senandika`, text, url });
+        await nav.share({ title: `${title} · Senandika`, text, url });
         return;
       } catch {
         /* dibatalkan / gagal → tampilkan opsi manual */
@@ -1066,8 +1049,8 @@ function SharePanel({ entry, url, icon }: { entry: Entry; url: string; icon?: bo
   }
 
   const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  const tg = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`“${title}” — Senandika`)}`;
-  const x = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`“${title}” — Senandika`)}&url=${encodeURIComponent(url)}`;
+  const tg = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`“${title}” · Senandika`)}`;
+  const x = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`“${title}” · Senandika`)}&url=${encodeURIComponent(url)}`;
 
   return (
     <div>
@@ -1188,7 +1171,7 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
     const map = new Map<string, Entry[]>();
     for (const e of [...entries].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))) {
       const d = new Date(e.createdAt);
-      const key = `${d.getFullYear()} — ${d.toLocaleDateString("id-ID", { month: "long" })}`;
+      const key = `${d.toLocaleDateString("id-ID", { month: "long" })} ${d.getFullYear()}`;
       if (!map.has(key)) map.set(key, []);
       map.get(key)?.push(e);
     }
@@ -1209,9 +1192,6 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
                 </span>
                 <span>
                   <span className="font-display block text-lg">{e.title || "Tanpa judul"}</span>
-                  <span className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-60">
-                    Untuk {e.recipient}
-                  </span>
                 </span>
               </button>
             ))}
