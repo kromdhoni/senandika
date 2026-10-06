@@ -529,7 +529,16 @@ export default function App() {
             <div className="stagger mt-6 grid gap-3">
               {(view === "favorit" ? favList : filtered).map((e, i) => (
                 <article key={e.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
-                  <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
+                  {e.cover ? (
+                    <img
+                      src={`${import.meta.env.BASE_URL}${e.cover}`}
+                      alt=""
+                      loading="lazy"
+                      className="h-36 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
+                  )}
                   <div className="p-5">
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className="font-display mt-1 block text-xl">{e.title || "Tanpa judul"}</span>
@@ -788,8 +797,8 @@ export default function App() {
               <li>Tandai favorit untuk menyimpan yang paling berarti di perambanmu.</li>
             </ol>
             <p className="mt-8 text-xs opacity-50">
-              Ditata dengan Playfair Display, Cormorant Garamond, dan Inter.
-              Diterbitkan sebagai situs statis. Tulisan pribadi bukan produk untuk dijual.
+              Ditata dengan Playfair Display, Cormorant Garamond, Amiri, dan Inter.
+              Foto sampul dari Pixabay. Diterbitkan sebagai situs statis. Tulisan pribadi bukan produk untuk dijual.
             </p>
           </section>
         )}

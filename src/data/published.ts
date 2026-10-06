@@ -9,6 +9,7 @@ import type { Entry, Memory } from "../types";
 export const PUBLISHED_ENTRIES: Entry[] = [
   {
     id: "puisi-25",
+    cover: "covers/harap.jpg",
     title: "Telah kusiapkan kolam duka",
     content:
       "Telah kusiapkan kolam duka\nuntuk menampung getir takdir;\nmemurnikan sebal dan sesal\nsebab aku ingin jadi manusia merdeka\nyang tak dikalahkan dunia",
@@ -24,6 +25,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-24",
+    cover: "covers/cinta-1.jpg",
     title: "Dengan atau tanpa mantra,",
     content:
       "Dengan atau tanpa mantra,\ncinta akan menembus\nbatas-batas kewajaran.\nseperti sebuah kunci,\nia berderit\ndi dalam tubuhmu,\nmeski telah kau hijab\njalan nasib menuju kesunyian.",
@@ -39,6 +41,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-12",
+    cover: "covers/tenang.jpg",
     title: "Apa yang hilang darimu",
     content:
       "مافاتك لم يخلق لك وما خلق لن يفوتك\nApa yang hilang darimu berarti tidak tercipta untukmu.Dan apa yang tercipta untukmu tidak akan hilang darimu",
@@ -54,6 +57,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-11",
+    cover: "covers/ayah.jpg",
     title: "Tidak ada pemberian terbaik dari seorang ayah",
     content:
       "ما نحل والد ولدًا أفضل من أدبٍ حسنٍ\n“Tidak ada pemberian terbaik dari seorang ayah kepd anaknya melebihi (penanaman) akhlak yang baik.”",
@@ -69,6 +73,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-10",
+    cover: "covers/tenang.jpg",
     title: "lihatlah apa yang dikatakan",
     content:
       "أنظر ما قال ولا تنظر من قال\n“lihatlah apa yang dikatakan dan jangan lihat siapa yang mengatakan”",
@@ -84,6 +89,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-09",
+    cover: "covers/cinta-2.jpg",
     title: "Ketika aku melihat mu,hatiku tersenyum",
     content:
       "حين اراك قلبي يبتسم\n“Ketika aku melihat mu,hatiku tersenyum”",
@@ -99,6 +105,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-08",
+    cover: "covers/cinta-1.jpg",
     title: "Aku tidak menemukan hari yang lebih indah,",
     content:
       "ما وجـدت يوما أجـمـل مـن يوم حـين لـقـيت بـيك\n“Aku tidak menemukan hari yang lebih indah, dari hari ketika aku bertemu denganmu”",
@@ -114,6 +121,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-07",
+    cover: "covers/harap.jpg",
     title: "tidak akan pergi sesuatu yang indah,",
     content:
       "اندينتا القادري:ما ذهب جميل الأ وجاء اجمل\n“tidak akan pergi sesuatu yang indah, kecuali akan digantikan dngan yang lebih indah”",
@@ -129,6 +137,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "doa-05",
+    cover: "covers/doa.jpg",
     title: "Allah adalah satu-satunya dukungan",
     content:
       "“ الله هو السند الوحيد الذي لا يخذلك .”\n“Allah adalah satu-satunya dukungan yang tidak akan mengecewakanmu.”",
@@ -144,6 +153,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "doa-04",
+    cover: "covers/doa.jpg",
     title: "Bagaimana aku akan takut dengan kemiskinan,",
     content:
       "كَيْفَاَخَافُمِنَالْفَقْرِ وَاَنَاعَبْدُالْغَنِّي\n“Bagaimana aku akan takut dengan kemiskinan,sedangkan aku adalah hamba dari yang maha kaya (Allah)”",
@@ -159,6 +169,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "doa-03",
+    cover: "covers/doa.jpg",
     title: "Kamu boleh menyebutkan nama nya di dalam doa mu,",
     content:
       "يمكنك دحر الاسماء في صلاتك ، لكن عليك أن\nKamu boleh menyebutkan nama nya di dalam doa mu, tapi kamu juga harus menerima jika nanti dia bukan takdirmu.",
@@ -174,6 +185,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "doa-02",
+    cover: "covers/doa.jpg",
     title: "Sejatinya cinta adalah doa",
     content:
       "فما الحب إلا الدعاء\n“Sejatinya cinta adalah Do'a”",
@@ -189,6 +201,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-06",
+    cover: "covers/cinta-2.jpg",
     title: "jangan sampe kita yang lelah mengingatkan,",
     content:
       "“jangan sampe kita yang lelah mengingatkan, ingatkan terus sampe mereka (yang spesial) lelah diingatkan”",
@@ -204,6 +217,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-05",
+    cover: "covers/harap.jpg",
     title: "Jika kamu sudah malas sekolah",
     content:
       "Jika kamu sudah malas sekolah maka jangan pernah mengajak temanmu untuk malas juga karena ada mimpi dan harapan orang tua nya yg dinanti dimasa depannya...",
@@ -219,6 +233,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-04",
+    cover: "covers/keluarga.jpg",
     title: "Jangan buat mereka malu",
     content:
       "“Nak, kalo belum bisa membanggakan orang tua, minimal jangan buat mereka malu, jangan buat keringat mereka jadi tangisan kesedihan, tapi buatlah keringat mereka menjadi tangis kebahagiaan”",
@@ -234,6 +249,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-03",
+    cover: "covers/guru.jpg",
     title: "Seporsi kekalahan Seorang guru...",
     content:
       "Seporsi kekalahan Seorang guru...\nadalah ketika murid mengira setiap teguran adalah kebencian. Padahal, itu adalah cara guru paling sederhana untuk mengatakan,\n“Saya tidak ingin kamu gagal.”",
@@ -249,6 +265,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-02",
+    cover: "covers/tenang.jpg",
     title: "Skenario Allah yang paling indah",
     content:
       "“Nanti Engkau akan paham tentang skenario Allah yang paling indah. Disaat engkau tidak berniat mencari sesuatu, tetapi Allah justru menghadirkan anugerah.”\nGus Baha",
@@ -264,6 +281,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "kata-01",
+    cover: "covers/tenang.jpg",
     title: "Konsep bahagia itu sederhana,",
     content:
       "Konsep bahagia itu sederhana, tidak memiliki ekspetasi berlebihan pada suatu hal di luar kendali, senang seadanya sedih sewajarnya.",
@@ -279,6 +297,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "doa-01",
+    cover: "covers/harap.jpg",
     title: "Entah seberat apapun beban di pundakmu,",
     content:
       "Entah seberat apapun beban di pundakmu, dan entah seberisik apa kepalamu sekarang, semoga Tuhan kuatkan mampukan, dan mudahkan setiap langkah dan proses.",
@@ -294,6 +313,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-23",
+    cover: "covers/cinta-1.jpg",
     title: "aku tak mahir berenang,",
     content:
       "aku tak mahir berenang,\nsebab itu kubiarkan\ndiriku tenggelam pada\nkedua matamu.",
@@ -309,6 +329,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-22",
+    cover: "covers/cinta-2.jpg",
     title: "beberapa manusia",
     content:
       "beberapa manusia\ndiciptakan sebagai obat,\ndan caramu\nmemandangku adalah\ndosis paling mujarab.",
@@ -324,6 +345,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-21",
+    cover: "covers/luka-2.jpg",
     title: "orang yang berduka",
     content:
       "orang yang berduka\nmengetahui bahwa\nhidup akan terus berlanjut,\nmereka bigung bagaimana\nmelanjutkan hidup tanpa seseorang\nyang dulu menemaninya.",
@@ -339,6 +361,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-20",
+    cover: "covers/luka-1.jpg",
     title: "mari makan perih ini.",
     content:
       "mari makan perih ini.\njangan pakai sendok,\ngunakan tangan telanjang\nagar kau tahu tekstur duka\nyang asli;\nlicin oleh darah dan\ntajam oleh kecewa.",
@@ -354,6 +377,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "seed-1",
+    cover: "covers/rumah.jpg",
     title: "Untuk Ibu, tentang rumah",
     content:
       "Ibu,\n\nTernyata aku baru mengerti betapa berat perjuanganmu. Rumah yang dulu terasa sempit, kini terasa jauh. Aku ingin pulang.\n\nTerima kasih sudah bertahan untukku.",
@@ -369,6 +393,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-19",
+    cover: "covers/harap.jpg",
     title: "di antara banyaknya kemungkinan",
     content:
       "di antara banyaknya kemungkinan\nyang bisa saja mempertemukanku\ndengan siapa saja.\nsemesta menuntunku\nbertemu denganmu\ndan..\nsejak itu aku tidak lagi\nmerasa kurang.",
@@ -384,6 +409,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-18",
+    cover: "covers/tenang.jpg",
     title: "kadang,",
     content:
       "kadang,\nyang membuat kita bertahan\nbukan kekuatan.\nmelainkan alasan\nkenapa kita harus\ntetap hidup.",
@@ -399,6 +425,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-17",
+    cover: "covers/cinta-1.jpg",
     title: "memang siapa yang",
     content:
       "memang siapa yang\ntidak luluh melawan\ntatapan yang teduh\ndan senyuman manis itu?",
@@ -414,6 +441,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-16",
+    cover: "covers/luka-1.jpg",
     title: "bukan karena lukanya mengering,",
     content:
       "bukan karena lukanya mengering,\ntapi karena rasa sakitnya sudah bertamu\nterlalu lama.\nsampai-sampai, kita lupa bagaimana rasanya\nhidup tanpa rasa perih.\nterkadang, kita tidak benar-benar sembuh.\nkita hanya terbiasa berjalan di atas pecahan kaca,\nsampai mengira berdarah adalah\nhal biasa.",
@@ -429,6 +457,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-15",
+    cover: "covers/luka-2.jpg",
     title: "mempercayai seseorang itu",
     content:
       "mempercayai seseorang itu\nibarat memberi senjata ke\ntangannya,\napakah dia akan\nmenjagamu atau\nmalah membunuhmu.",
@@ -444,6 +473,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-14",
+    cover: "covers/harap.jpg",
     title: "jangan terlalu dipikirkan",
     content:
       "jangan terlalu dipikirkan\nendingnya, tetaplah\nberjuang untuk sesuatu\nyang sudah kamu\nniatkan.",
@@ -459,6 +489,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-13",
+    cover: "covers/rindu.jpg",
     title: "barangkali",
     content:
       "barangkali\ntidak ada\nyang tahu_\naku lebih sering\nberumah di rindumu,\ndaripada di tubuhku\nsendiri.",
@@ -474,6 +505,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-12",
+    cover: "covers/cinta-2.jpg",
     title: "jika hidup adalah",
     content:
       "jika hidup adalah\nsebuah buku,\nmaka bertemu\ndenganmu adalah\nbab favoritku.",
@@ -489,6 +521,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-11",
+    cover: "covers/tenang.jpg",
     title: "tugas kita hanya selalu",
     content:
       "tugas kita hanya selalu\nberbuat baik kepada orang\nyang hadir dan kita temui,\nmau kembali dalam bentuk\nsebaliknya, itu sudah di luar\nkendali kita.\njangan ubah\ntetaplah teduh\nbagi siapapun.",
@@ -504,6 +537,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-10",
+    cover: "covers/cinta-1.jpg",
     title: "bahkan jika semesta",
     content:
       "bahkan jika semesta\nmenunjukkan seribu\nkekuranganmu, aku akan\ntetap memilihmu berulang\nkali tanpa ragu.",
@@ -519,6 +553,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-09",
+    cover: "covers/luka-1.jpg",
     title: "dunia ini bukan",
     content:
       "dunia ini bukan\nrahim ibumu,ia\ntak peduli kamu\nlapar ataupun\nhampir mati.\npilihan hanya dua;\nmenaklukan kota\natau membusuk\ndi desa.",
@@ -534,6 +569,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-08",
+    cover: "covers/rindu.jpg",
     title: "dan aku selalu ingin",
     content:
       "dan aku selalu ingin\nmemastikan kamu\ntetap baik-baik saja,\nmeski jauh,\nmeski tidak bertemu,\ndan meski kamu tidak\nmelihatku.",
@@ -549,6 +585,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-07",
+    cover: "covers/luka-1.jpg",
     title: "lautan yang terlihat tenang,",
     content:
       "lautan yang terlihat tenang,\nbukan berarti tidak menyimpan\nkegelapan di dalamnya.\nhanya saja\ndia pandai\nmenutupi lukanya.",
@@ -564,6 +601,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-06",
+    cover: "covers/harap.jpg",
     title: "terima kasih.",
     content:
       "terima kasih.\nsudah menjadi bahagia\nyang\ntak di sangka-sangka,\ndatang pelan-pelan\nmasuk\ndengan sopan,\nlalu\nbertahan.",
@@ -579,6 +617,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-05",
+    cover: "covers/tenang.jpg",
     title: "perkara mencintaimu,",
     content:
       "perkara mencintaimu,\nuntung rugi tak pernah\naku peduli.\nyang berlaku untukmu\ntak mesti kembali padaku\nyang terjadi atasku\nseharusnya tak usah kau tahu.\nsebab mencintaimu,\nadalah perkara tuntas\nyang hendaknya tak\nperlu di bahas.",
@@ -594,6 +633,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-04",
+    cover: "covers/cinta-2.jpg",
     title: "aku berani bersumpah,",
     content:
       "aku berani bersumpah,\nbahwa senyum manismu\nsungguh indah.\nbolehkah\nkubeli satu?\nnamun, mata uang kita\nyang lemah tidak layak\nmenukar bagian dirimu\nyang terlampau mewah.",
@@ -609,6 +649,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-03",
+    cover: "covers/cinta-1.jpg",
     title: "Kamu terlalu indah...",
     content:
       "Kamu terlalu indah...\nuntuk kujamah dengan cara yang salah.\nTerlalu suci untuk kusebut sebagai milik,\npadahal Tuhan belum merestui.\nTerlalu bernilai untuk kudekati\ntanpa niat yang utuh,\ntanpa keberanian yang jelas.",
@@ -624,6 +665,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-02",
+    cover: "covers/malam.jpg",
     title: "malam ini,",
     content:
       "malam ini,\ntidak ada kalimat indah\nhanya kaki yang pegal,\nkasur yang dingin,\ndan keinginan sederhana;\nsemoga besok\ntidak terlalu berat.",
@@ -639,6 +681,7 @@ export const PUBLISHED_ENTRIES: Entry[] = [
   },
   {
     id: "puisi-01",
+    cover: "covers/luka-2.jpg",
     title: "aku tertawa",
     content:
       "aku tertawa\nagar luka tidak curiga.\naku bercanda\nagar sedih kehilangan alamat.\naku baik-baik saja_\nkalimat paling bersenjata\nyang pernah kupunya.",

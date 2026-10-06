@@ -29,6 +29,7 @@ export interface Entry {
   type: EntryType;
   mood: Mood | "";
   tags: string[];
+  cover?: string;
   isFavorite: boolean;
   isPrivate: boolean;
   status: "draft" | "saved";
