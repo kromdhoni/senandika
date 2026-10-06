@@ -86,6 +86,7 @@ export default function App() {
   const [filterRecipient, setFilterRecipient] = useState<Recipient | "Semua">("Semua");
   const [theme, setThemeState] = useState<"light" | "dark">(getTheme());
   const [admin, setAdmin] = useState(isAdmin());
+  const [immersive, setImmersive] = useState(false);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -186,6 +187,49 @@ export default function App() {
     setMemories(fresh.memories);
   }
 
+  function entryUrl(id: string) {
+    return `${window.location.origin}${window.location.pathname}#/baca/${id}`;
+  }
+
+  function openEntry(id: string, full = false) {
+    setActiveId(id);
+    setView("baca");
+    setImmersive(full);
+    try {
+      window.history.replaceState(null, "", `#/baca/${id}`);
+    } catch {
+      /* abaikan */
+    }
+  }
+
+  useEffect(() => {
+    const applyHash = () => {
+      const m = window.location.hash.match(/^#\/baca\/([\w-]+)/);
+      if (!m) return;
+      const exists = load().entries.some((e) => e.id === m[1]);
+      if (!exists) return;
+      setActiveId(m[1]);
+      setView("baca");
+      setImmersive(true);
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
+  useEffect(() => {
+    if (view !== "baca") {
+      setImmersive(false);
+      try {
+        if (window.location.hash.startsWith("#/baca/")) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      } catch {
+        /* abaikan */
+      }
+    }
+  }, [view]);
+
   const nav: { id: View; label: string }[] = [
     { id: "dashboard", label: "Beranda" },
     { id: "senandika", label: "Senandika" },
@@ -193,12 +237,66 @@ export default function App() {
     { id: "timeline", label: "Timeline" },
   ];
 
+  const sortedAll = useMemo(
+    () => [...entries].sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt)),
+    [entries],
+  );
+  const activeIndex = active ? sortedAll.findIndex((e) => e.id === active.id) : -1;
+  const newerEntry = activeIndex > 0 ? sortedAll[activeIndex - 1] : null;
+  const olderEntry = activeIndex >= 0 && activeIndex < sortedAll.length - 1 ? sortedAll[activeIndex + 1] : null;
+
   const favList = filtered.filter((e) => e.isFavorite);
 
   const marqueeLines = useMemo(
     () => entries.filter((e) => e.type === "POEM").slice(0, 8).map((e) => e.content.split("\n")[0]),
     [entries],
   );
+
+  if (view === "baca" && active && immersive) {
+    return (
+      <div className="min-h-screen">
+        <Waves />
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
+          <button onClick={() => setImmersive(false)} className="btn-ghost px-4 py-2 text-sm">
+            ← Kembali
+          </button>
+          <span className="font-display text-sm opacity-70">
+            Senandika<span style={{ color: "var(--accent)" }}>.</span>
+          </span>
+        </div>
+        <article key={active.id} className="fade-in mx-auto max-w-2xl px-5 pb-20 pt-4">
+          <p className="flex flex-wrap items-center justify-center gap-2 text-center text-xs uppercase tracking-widest opacity-60">
+            {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient} <MoodTag mood={active.mood} />
+          </p>
+          <h1 className="font-display mt-3 text-center text-4xl font-medium md:text-5xl">
+            {active.title || "Tanpa judul"}
+          </h1>
+          <p className="mt-3 text-center text-sm opacity-60">
+            {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+            {active.tags.length > 0 && ` · ${active.tags.join(" · ")}`}
+          </p>
+          <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
+          <div className="prose-read dropcap whitespace-pre-wrap">{active.content}</div>
+          <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
+          <div className="flex justify-center">
+            <SharePanel entry={active} url={entryUrl(active.id)} />
+          </div>
+          <nav className="mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
+            {newerEntry ? (
+              <button onClick={() => openEntry(newerEntry.id, true)} className="btn-ghost px-4 py-2">
+                ← Lebih baru
+              </button>
+            ) : <span />}
+            {olderEntry ? (
+              <button onClick={() => openEntry(olderEntry.id, true)} className="btn-ghost px-4 py-2">
+                Lebih lama →
+              </button>
+            ) : <span />}
+          </nav>
+        </article>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -272,7 +370,7 @@ export default function App() {
             )}
 
             {entries[0] && (
-              <button onClick={() => { setActiveId(entries[0].id); setView("baca"); }} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
+              <button onClick={() => openEntry(entries[0].id)} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
                 <span className="quote-mark" aria-hidden="true">“</span>
                 <span className="font-display -mt-6 block text-2xl">{entries[0].title || "Tanpa judul"}</span>
                 <span className="mt-2 block text-sm opacity-70">
@@ -327,7 +425,7 @@ export default function App() {
               {entries[0] ? (
                 <button
                   className="mt-3 block w-full text-left"
-                  onClick={() => { setActiveId(entries[0].id); setView("baca"); }}
+                  onClick={() => openEntry(entries[0].id)}
                 >
                   <span className="font-display text-2xl">“{entries[0].title || "Tanpa judul"}”</span>
                   <span className="mt-2 flex flex-wrap items-center gap-2 text-sm opacity-70">
@@ -396,7 +494,7 @@ export default function App() {
             <div className="stagger mt-6 grid gap-3">
               {(view === "favorit" ? favList : filtered).map((e, i) => (
                 <article key={e.id} className="card card-lift p-5" style={{ ["--i" as string]: Math.min(i, 6) }}>
-                  <button className="block w-full text-left" onClick={() => { setActiveId(e.id); setView("baca"); }}>
+                  <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
                       {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient} <MoodTag mood={e.mood} />
                     </span>
@@ -514,13 +612,23 @@ export default function App() {
             </p>
             <div className="divider-orn my-6" aria-hidden="true"><span>✦</span></div>
             <div className="prose-read dropcap whitespace-pre-wrap">{active.content}</div>
-            <div className="mt-8 flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap items-center gap-2">
+              <SharePanel entry={active} url={entryUrl(active.id)} />
+              <button onClick={() => setImmersive(true)} className="btn-ghost text-sm">Layar penuh</button>
               <button onClick={() => toggleFav(active.id)} className="btn-ghost text-sm">{active.isFavorite ? "★ Favorit" : "☆ Jadikan favorit"}</button>
               {admin && <button onClick={() => openEdit(active)} className="btn-ghost text-sm">Ubah</button>}
               <button onClick={() => download(`${active.title || "senandika"}.md`, toMarkdownEntry(active), "text/markdown")} className="btn-ghost text-sm">Export .md</button>
               {admin && <button onClick={() => removeEntry(active.id)} className="btn-ghost text-sm">Hapus</button>}
             </div>
           </article>
+        )}
+
+        {view === "baca" && !active && (
+          <section className="fade-in mx-auto max-w-xl py-16 text-center">
+            <p className="font-display text-2xl">Tulisan tidak ditemukan.</p>
+            <p className="mt-2 text-sm opacity-70">Mungkin tautannya sudah berubah. Mari kembali membaca yang lain.</p>
+            <button onClick={() => setView("senandika")} className="btn-primary mt-5">Lihat Senandika</button>
+          </section>
         )}
 
         {view === "kenangan" && (
@@ -555,7 +663,7 @@ export default function App() {
             <p className="eyebrow">Jejak waktu</p>
             <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Timeline</h2>
             <p className="mt-2 text-sm opacity-70">Perjalanan cerita berdasarkan waktu.</p>
-            <TimelineList entries={entries} onOpen={(id) => { setActiveId(id); setView("baca"); }} />
+            <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
           </section>
         )}
 
@@ -661,6 +769,70 @@ export default function App() {
           ))}
         </div>
       </nav>
+    </div>
+  );
+}
+
+function SharePanel({ entry, url }: { entry: Entry; url: string }) {
+  const [showOptions, setShowOptions] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const title = entry.title || "Tanpa judul";
+  const excerpt = entry.content.split("\n").slice(0, 4).join("\n");
+  const text = `“${title}” — Senandika\n\n${excerpt}\n\nBaca selengkapnya: ${url}`;
+
+  async function nativeShare() {
+    const nav = navigator as Navigator & {
+      share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+    };
+    if (nav.share) {
+      try {
+        await nav.share({ title: `${title} — Senandika`, text, url });
+        return;
+      } catch {
+        /* dibatalkan / gagal → tampilkan opsi manual */
+      }
+    }
+    setShowOptions((v) => !v);
+  }
+
+  async function copyLink() {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* abaikan */
+    }
+  }
+
+  const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const tg = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`“${title}” — Senandika`)}`;
+  const x = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`“${title}” — Senandika`)}&url=${encodeURIComponent(url)}`;
+
+  return (
+    <div>
+      <button onClick={nativeShare} className="btn-primary px-5 py-2 text-sm">
+        Bagikan
+      </button>
+      {showOptions && (
+        <div className="card mt-2 flex flex-wrap gap-2 p-3 text-sm">
+          <a href={wa} target="_blank" rel="noreferrer" className="btn-ghost px-4 py-2">WhatsApp</a>
+          <a href={tg} target="_blank" rel="noreferrer" className="btn-ghost px-4 py-2">Telegram</a>
+          <a href={x} target="_blank" rel="noreferrer" className="btn-ghost px-4 py-2">X</a>
+          <button onClick={copyLink} className="btn-ghost px-4 py-2">
+            {copied ? "Tautan disalin." : "Salin tautan"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
