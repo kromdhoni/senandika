@@ -12,6 +12,8 @@ import {
   type View,
 } from "./types";
 import { GAYA_PUISI } from "./data/gaya";
+import Reveal from "./components/Reveal";
+import Waves from "./components/Waves";
 import {
   adminLogin,
   adminLogout,
@@ -193,8 +195,14 @@ export default function App() {
 
   const favList = filtered.filter((e) => e.isFavorite);
 
+  const marqueeLines = useMemo(
+    () => entries.filter((e) => e.type === "POEM").slice(0, 8).map((e) => e.content.split("\n")[0]),
+    [entries],
+  );
+
   return (
     <div className="min-h-screen">
+      <Waves />
       <header className="sticky top-0 z-10 border-b backdrop-blur" style={{ background: "color-mix(in srgb, var(--bg) 86%, transparent)", borderColor: "color-mix(in srgb, var(--muted) 25%, transparent)" }}>
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <button onClick={() => setView("landing")} className="font-display text-xl font-semibold tracking-tight" aria-label="Senandika beranda">
@@ -247,8 +255,24 @@ export default function App() {
               <button onClick={() => setView("dashboard")} className="btn-ghost">Lihat Isinya</button>
             </div>
 
+            {marqueeLines.length > 0 && (
+              <div className="marquee mt-12" aria-label="Larik-larik puisi berjalan">
+                <div className="marquee-track">
+                  {[0, 1].map((copy) => (
+                    <div key={copy} className="flex shrink-0 items-center gap-8 pr-8" aria-hidden={copy === 1}>
+                      {marqueeLines.map((line) => (
+                        <span key={`${copy}-${line}`} className="font-display flex items-center gap-8 text-lg italic opacity-70">
+                          {line} <span style={{ color: "var(--accent)" }}>✦</span>
+                        </span>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {entries[0] && (
-              <button onClick={() => { setActiveId(entries[0].id); setView("baca"); }} className="card card-lift hero-frame mx-auto mt-14 block max-w-xl p-7 text-left">
+              <button onClick={() => { setActiveId(entries[0].id); setView("baca"); }} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
                 <span className="quote-mark" aria-hidden="true">“</span>
                 <span className="font-display -mt-6 block text-2xl">{entries[0].title || "Tanpa judul"}</span>
                 <span className="mt-2 block text-sm opacity-70">
@@ -261,7 +285,8 @@ export default function App() {
               </button>
             )}
 
-            <div className="stagger mt-14 grid gap-4 text-left sm:grid-cols-2" style={{ ["--i" as string]: 0 }}>
+            <Reveal className="mt-14">
+            <div className="stagger grid gap-4 text-left sm:grid-cols-2" style={{ ["--i" as string]: 0 }}>
               {[
                 ["Surat", "Ditulis untuk seseorang, meskipun tidak pernah dikirim."],
                 ["Kenangan", "Cerita dan momen yang tidak ingin dilupakan."],
@@ -274,13 +299,16 @@ export default function App() {
                 </div>
               ))}
             </div>
+            </Reveal>
 
+            <Reveal>
             <figure className="mx-auto mt-14 max-w-xl">
               <blockquote className="font-display text-xl italic opacity-80 md:text-2xl">
                 “Tidak semua perasaan harus dikirim. Beberapa cukup dituliskan agar tidak hilang.”
               </blockquote>
               <div className="divider-orn mt-6" aria-hidden="true"><span>✦</span></div>
             </figure>
+            </Reveal>
           </section>
         )}
 
