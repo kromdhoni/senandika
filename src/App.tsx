@@ -247,7 +247,7 @@ export default function App() {
 
   const nav: { id: View; label: string }[] = [
     { id: "dashboard", label: "Beranda" },
-    { id: "senandika", label: "Senandika" },
+    { id: "senandika", label: "Koleksi" },
     { id: "kenangan", label: "Kenangan" },
     { id: "timeline", label: "Timeline" },
     { id: "kapsul", label: "Kapsul" },
@@ -361,9 +361,16 @@ export default function App() {
                 {n.label}
               </button>
             ))}
-            <button onClick={() => setThemeState(theme === "dark" ? "light" : "dark")} className="btn-ghost ml-2 px-4 py-2 text-sm" aria-label="Alih tema">
-              {theme === "dark" ? "Terang" : "Gelap"}
-            </button>
+            <span className="ml-2">
+              <IconBtn
+                label={theme === "dark" ? "Mode terang" : "Mode gelap"}
+                onClick={() => setThemeState(theme === "dark" ? "light" : "dark")}
+              >
+                {theme === "dark"
+                  ? strokeIcon("M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4")
+                  : strokeIcon("M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z")}
+              </IconBtn>
+            </span>
             {admin && (
               <button onClick={() => openNew()} className="btn-primary ml-2 px-5 py-2 text-sm">
                 + Tulis
@@ -546,8 +553,8 @@ export default function App() {
           <section className="fade-in mx-auto max-w-3xl">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="eyebrow">{view === "favorit" ? "Penanda pribadi" : "Koleksi"}</p>
-                <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">{view === "favorit" ? "Favorit" : "Senandika"}</h2>
+                <p className="eyebrow">{view === "favorit" ? "Penanda pribadi" : "Senandika"}</p>
+                <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">{view === "favorit" ? "Favorit" : "Koleksi"}</h2>
               </div>
               {admin && (
                 <button onClick={() => openNew()} className="btn-primary hidden px-5 py-2 text-sm sm:block">+ Tulis</button>
@@ -720,7 +727,7 @@ export default function App() {
           <section className="fade-in mx-auto max-w-xl py-16 text-center">
             <p className="font-display text-2xl">Tulisan tidak ditemukan.</p>
             <p className="mt-2 text-sm opacity-70">Mungkin tautannya sudah berubah. Mari kembali membaca yang lain.</p>
-            <button onClick={() => setView("senandika")} className="btn-primary mt-5">Lihat Senandika</button>
+            <button onClick={() => setView("senandika")} className="btn-primary mt-5">Lihat Koleksi</button>
           </section>
         )}
 
@@ -929,7 +936,7 @@ export default function App() {
         <div className={`grid text-xs ${admin ? "grid-cols-5" : "grid-cols-5"}`}>
           {[
             { id: "dashboard", label: "Beranda" },
-            { id: "senandika", label: "Senandika" },
+            { id: "senandika", label: "Koleksi" },
             ...(admin
               ? [{ id: "tulis", label: "+ Tulis" }]
               : [{ id: "timeline", label: "Timeline" }]),
