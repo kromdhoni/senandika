@@ -391,10 +391,6 @@ export default function App() {
                   <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca →</button>
                   <button onClick={() => setView("tentang")} className="btn-ghost">Tentang Senandika</button>
                 </div>
-                <p className="mt-8 hidden items-center gap-2 text-xs opacity-50 md:flex" aria-hidden="true">
-                  <span className="inline-block h-8 w-5 rounded-full border" style={{ borderColor: "var(--line)" }} />
-                  Gulir untuk menjelajah
-                </p>
               </div>
               <div className="relative mx-auto w-full max-w-sm px-6 pb-8 pt-4">
                 <div className="arch absolute inset-0" aria-hidden="true" />
@@ -448,6 +444,9 @@ export default function App() {
                 “Tidak semua perasaan harus dikirim. Beberapa cukup dituliskan agar tidak hilang.”
               </blockquote>
               <div className="divider-orn mt-6" aria-hidden="true"><span>✦</span></div>
+              <div className="mt-8">
+                <button onClick={() => setView("senandika")} className="btn-primary">Jelajahi Koleksi →</button>
+              </div>
             </figure>
             </Reveal>
           </section>
