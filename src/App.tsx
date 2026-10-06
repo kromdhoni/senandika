@@ -24,7 +24,6 @@ import {
   resetToPublished,
   save,
   setTheme,
-  toMarkdownEntry,
   toPublishedTs,
   uid,
 } from "./lib/store";
@@ -318,16 +317,15 @@ export default function App() {
       <Waves />
       <header className="sticky top-0 z-10 border-b backdrop-blur" style={{ background: "color-mix(in srgb, var(--bg) 86%, transparent)", borderColor: "color-mix(in srgb, var(--muted) 25%, transparent)" }}>
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <button onClick={() => setView("landing")} className="font-display text-xl font-semibold tracking-tight" aria-label="Senandika beranda">
+          <button onClick={() => setView("landing")} className="font-display text-lg font-semibold uppercase tracking-[0.24em]" aria-label="Senandika beranda">
             Senandika
-            <span style={{ color: "var(--accent)" }}>.</span>
           </button>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
             {nav.map((n) => (
               <button
                 key={n.id}
                 onClick={() => setView(n.id)}
-                className={`rounded-full px-4 py-2 text-sm ${view === n.id ? "font-semibold underline underline-offset-8" : "opacity-70 hover:opacity-100"}`}
+                className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.18em] ${view === n.id ? "font-semibold underline underline-offset-8" : "opacity-70 hover:opacity-100"}`}
               >
                 {n.label}
               </button>
@@ -661,7 +659,6 @@ export default function App() {
               <button onClick={() => setImmersive(true)} className="btn-ghost text-sm">Layar penuh</button>
               <button onClick={() => toggleFav(active.id)} className="btn-ghost text-sm">{active.isFavorite ? "★ Favorit" : "☆ Jadikan favorit"}</button>
               {admin && <button onClick={() => openEdit(active)} className="btn-ghost text-sm">Ubah</button>}
-              <button onClick={() => download(`${active.title || "senandika"}.md`, toMarkdownEntry(active), "text/markdown")} className="btn-ghost text-sm">Export .md</button>
               {admin && <button onClick={() => removeEntry(active.id)} className="btn-ghost text-sm">Hapus</button>}
             </div>
           </article>
