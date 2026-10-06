@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ENTRY_TYPES,
+  ENTRY_TYPE_LABELS,
   MOODS,
   RECIPIENTS,
   type Entry,
@@ -10,6 +11,7 @@ import {
   type Recipient,
   type View,
 } from "./types";
+import { GAYA_PUISI } from "./data/gaya";
 import {
   adminLogin,
   adminLogout,
@@ -368,7 +370,7 @@ export default function App() {
                 <article key={e.id} className="card card-lift p-5" style={{ ["--i" as string]: Math.min(i, 6) }}>
                   <button className="block w-full text-left" onClick={() => { setActiveId(e.id); setView("baca"); }}>
                     <span className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-                      {e.type} · Untuk {e.recipient} <MoodTag mood={e.mood} />
+                      {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient} <MoodTag mood={e.mood} />
                     </span>
                     <span className="font-display mt-1 block text-xl">{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, 120)}{e.content.length > 120 ? "…" : ""}</span>
@@ -434,11 +436,28 @@ export default function App() {
             </div>
             <textarea
               className="input prose-read mt-4 min-h-[320px]"
-              placeholder="Tuliskan di sini…"
+              placeholder={draft.type === "POEM" ? "tulis dengan huruf kecil…\nbiarkan satu kata berat\nberdiri sendiri." : "Tuliskan di sini…"}
               value={draft.content}
               onChange={(e) => setDraft({ ...draft, content: e.target.value })}
               aria-label="Isi tulisan"
             />
+            {draft.type === "POEM" && (
+              <details className="card mt-3 p-5 text-sm">
+                <summary className="font-display cursor-pointer text-lg">{GAYA_PUISI.judul} — referensi gayamu</summary>
+                <p className="mt-2 opacity-75">{GAYA_PUISI.ringkasan}</p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 opacity-85">
+                  {GAYA_PUISI.ciri.map((c) => <li key={c}>{c}</li>)}
+                </ul>
+                <p className="mt-3 font-semibold">Anjuran</p>
+                <ul className="mt-1 list-disc space-y-1 pl-5 opacity-85">
+                  {GAYA_PUISI.anjuran.map((a) => <li key={a}>{a}</li>)}
+                </ul>
+                <p className="mt-3 font-semibold">Hindari</p>
+                <ul className="mt-1 list-disc space-y-1 pl-5 opacity-85">
+                  {GAYA_PUISI.hindari.map((h) => <li key={h}>{h}</li>)}
+                </ul>
+              </details>
+            )}
             <input
               className="input mt-3"
               placeholder="Tag, pisahkan dengan koma. Contoh: rumah, rindu"
@@ -458,7 +477,7 @@ export default function App() {
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
             <p className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-              {active.type} · Untuk {active.recipient} <MoodTag mood={active.mood} />
+              {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient} <MoodTag mood={active.mood} />
             </p>
             <h2 className="font-display mt-2 text-4xl font-medium md:text-5xl">{active.title || "Tanpa judul"}</h2>
             <p className="mt-3 text-sm opacity-60">

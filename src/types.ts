@@ -1,4 +1,4 @@
-export type EntryType = "LETTER" | "JOURNAL" | "MEMORY" | "PRAYER" | "NOTE";
+export type EntryType = "LETTER" | "JOURNAL" | "MEMORY" | "PRAYER" | "NOTE" | "POEM";
 
 export type Mood =
   | "Bahagia"
@@ -84,5 +84,15 @@ export const ENTRY_TYPES: { value: EntryType; label: string }[] = [
   { value: "JOURNAL", label: "Jurnal" },
   { value: "MEMORY", label: "Kenangan" },
   { value: "PRAYER", label: "Doa" },
+  { value: "POEM", label: "Puisi" },
   { value: "NOTE", label: "Catatan" },
 ];
+
+export const ENTRY_TYPE_LABELS: Record<EntryType, string> = {
+  LETTER: "Surat",
+  JOURNAL: "Jurnal",
+  MEMORY: "Kenangan",
+  PRAYER: "Doa",
+  POEM: "Puisi",
+  NOTE: "Catatan",
+};
