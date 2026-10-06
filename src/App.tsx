@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ENTRY_TYPES,
   ENTRY_TYPE_LABELS,
@@ -332,9 +332,13 @@ export default function App() {
           <button onClick={() => setImmersive(false)} className="btn-ghost px-4 py-2 text-sm">
             ← Kembali
           </button>
-          <span className="chip" role="group" aria-label="Ukuran huruf">
-            <button onClick={() => changeFontScale(-1)} aria-label="Perkecil huruf" className="px-1">A-</button>
-            <button onClick={() => changeFontScale(1)} aria-label="Perbesar huruf" className="px-1">A+</button>
+          <span className="flex items-center gap-2" role="group" aria-label="Ukuran huruf">
+            <IconBtn label="Perkecil huruf" onClick={() => changeFontScale(-1)}>
+              <span className="font-semibold" style={{ fontSize: "11px" }}>A</span>
+            </IconBtn>
+            <IconBtn label="Perbesar huruf" onClick={() => changeFontScale(1)}>
+              <span className="font-semibold" style={{ fontSize: "15px" }}>A</span>
+            </IconBtn>
           </span>
           <span className="font-display text-sm opacity-70">
             Senandika<span style={{ color: "var(--accent)" }}>.</span>
@@ -355,7 +359,7 @@ export default function App() {
           <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
           <div className="no-print flex justify-center">
-            <SharePanel entry={active} url={entryUrl(active.id)} />
+            <SharePanel entry={active} url={entryUrl(active.id)} icon />
           </div>
           <nav className="no-print mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
             {newerEntry ? (
@@ -733,14 +737,30 @@ export default function App() {
             <div className="divider-orn my-6" aria-hidden="true"><span>✦</span></div>
             <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
             <div className="no-print mt-8 flex flex-wrap items-center gap-2">
-              <SharePanel entry={active} url={entryUrl(active.id)} />
-              <button onClick={() => setImmersive(true)} className="btn-ghost text-sm">Layar penuh</button>
-              <button onClick={() => window.print()} className="btn-ghost text-sm">Cetak</button>
-              <span className="chip" role="group" aria-label="Ukuran huruf">
-                <button onClick={() => changeFontScale(-1)} aria-label="Perkecil huruf" className="px-1">A-</button>
-                <button onClick={() => changeFontScale(1)} aria-label="Perbesar huruf" className="px-1">A+</button>
+              <SharePanel entry={active} url={entryUrl(active.id)} icon />
+              <IconBtn label="Layar penuh" onClick={() => setImmersive(true)}>
+                {strokeIcon("M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7")}
+              </IconBtn>
+              <IconBtn label="Cetak" onClick={() => window.print()}>
+                {strokeIcon("M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z")}
+              </IconBtn>
+              <span className="flex items-center gap-2" role="group" aria-label="Ukuran huruf">
+                <IconBtn label="Perkecil huruf" onClick={() => changeFontScale(-1)}>
+                  <span className="font-semibold" style={{ fontSize: "11px" }}>A</span>
+                </IconBtn>
+                <IconBtn label="Perbesar huruf" onClick={() => changeFontScale(1)}>
+                  <span className="font-semibold" style={{ fontSize: "15px" }}>A</span>
+                </IconBtn>
               </span>
-              <button onClick={() => toggleFav(active.id)} className="btn-ghost text-sm">{active.isFavorite ? "★ Favorit" : "☆ Jadikan favorit"}</button>
+              <IconBtn
+                label={active.isFavorite ? "Hapus dari favorit" : "Jadikan favorit"}
+                onClick={() => toggleFav(active.id)}
+                active={active.isFavorite}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill={active.isFavorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z" />
+                </svg>
+              </IconBtn>
               {admin && <button onClick={() => openEdit(active)} className="btn-ghost text-sm">Ubah</button>}
               {admin && <button onClick={() => removeEntry(active.id)} className="btn-ghost text-sm">Hapus</button>}
             </div>
@@ -1056,7 +1076,38 @@ function WriteSheet({
   );
 }
 
-function SharePanel({ entry, url }: { entry: Entry; url: string }) {
+function IconBtn({
+  label,
+  onClick,
+  active,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  active?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`icon-btn${active ? " active" : ""}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function strokeIcon(d: string) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
+
+function SharePanel({ entry, url, icon }: { entry: Entry; url: string; icon?: boolean }) {
   const [showOptions, setShowOptions] = useState(false);
   const [copied, setCopied] = useState(false);
   const title = entry.title || "Tanpa judul";
@@ -1103,9 +1154,20 @@ function SharePanel({ entry, url }: { entry: Entry; url: string }) {
 
   return (
     <div>
-      <button onClick={nativeShare} className="btn-primary px-5 py-2 text-sm">
-        Bagikan
-      </button>
+      {icon ? (
+        <IconBtn label="Bagikan" onClick={nativeShare}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4" />
+          </svg>
+        </IconBtn>
+      ) : (
+        <button onClick={nativeShare} className="btn-primary px-5 py-2 text-sm">
+          Bagikan
+        </button>
+      )}
       {showOptions && (
         <div className="card mt-2 flex flex-wrap gap-2 p-3 text-sm">
           <a href={wa} target="_blank" rel="noreferrer" className="btn-ghost px-4 py-2">WhatsApp</a>
