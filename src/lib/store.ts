@@ -1,58 +1,81 @@
+import { PUBLISHED_ENTRIES, PUBLISHED_MEMORIES } from "../data/published";
 import type { Entry, Memory } from "../types";
+
+/**
+ * PIN admin — gerbang tulisan di situs statis (GitHub Pages).
+ * Catatan jujur: PIN ini ada di kode frontend sehingga hanya
+ * menghentikan pengunjung biasa, bukan serangan sungguhan.
+ * Auth sesungguhnya butuh backend (Workers + D1, lihat PRD).
+ * Ganti PIN ini lalu deploy ulang untuk menggantinya.
+ */
+export const ADMIN_PIN = "Oyisam21";
 
 const KEY = "senandika.v1";
 const THEME_KEY = "senandika.theme";
+const ADMIN_KEY = "senandika.admin";
 
 interface Persisted {
   entries: Entry[];
   memories: Memory[];
 }
 
-const seed: Persisted = {
-  entries: [
-    {
-      id: "seed-1",
-      title: "Untuk Ibu, tentang rumah",
-      content:
-        "Ibu,\n\nTernyata aku baru mengerti betapa berat perjuanganmu. Rumah yang dulu terasa sempit, kini terasa jauh. Aku ingin pulang.\n\nTerima kasih sudah bertahan untukku.",
-      recipient: "Ibu",
-      type: "LETTER",
-      mood: "Rindu",
-      tags: ["rumah", "pulang"],
-      isFavorite: true,
-      isPrivate: true,
-      status: "saved",
-      createdAt: "2026-10-02T10:00:00.000Z",
-      updatedAt: "2026-10-02T10:00:00.000Z",
-    },
-  ],
-  memories: [
-    {
-      id: "mem-1",
-      title: "Hari ketika semuanya berubah",
-      story: "Hari ketika aku menjadi seorang Ayah.",
-      memoryDate: "2022-08-27",
-      location: "Rumah",
-      createdAt: "2022-08-27T10:00:00.000Z",
-    },
-  ],
-};
+function freshCopy(): Persisted {
+  return {
+    entries: JSON.parse(JSON.stringify(PUBLISHED_ENTRIES)) as Entry[],
+    memories: JSON.parse(JSON.stringify(PUBLISHED_MEMORIES)) as Memory[],
+  };
+}
 
 export function load(): Persisted {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) {
-      localStorage.setItem(KEY, JSON.stringify(seed));
-      return seed;
+      const fresh = freshCopy();
+      localStorage.setItem(KEY, JSON.stringify(fresh));
+      return fresh;
     }
     return JSON.parse(raw) as Persisted;
   } catch {
-    return seed;
+    return freshCopy();
   }
 }
 
 export function save(data: Persisted) {
   localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+export function resetToPublished(): Persisted {
+  const fresh = freshCopy();
+  localStorage.setItem(KEY, JSON.stringify(fresh));
+  return fresh;
+}
+
+export function isAdmin(): boolean {
+  try {
+    return sessionStorage.getItem(ADMIN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function adminLogin(pin: string): boolean {
+  if (pin === ADMIN_PIN) {
+    try {
+      sessionStorage.setItem(ADMIN_KEY, "1");
+    } catch {
+      /* abaikan */
+    }
+    return true;
+  }
+  return false;
+}
+
+export function adminLogout() {
+  try {
+    sessionStorage.removeItem(ADMIN_KEY);
+  } catch {
+    /* abaikan */
+  }
 }
 
 export function uid(prefix: string) {
@@ -75,6 +98,16 @@ export function toMarkdownEntry(e: Entry) {
   return `# ${e.title}\n\nUntuk: ${e.recipient}\nJenis: ${e.type}\nMood: ${e.mood || "-"}\nTanggal: ${new Date(
     e.createdAt,
   ).toLocaleDateString("id-ID")}\nTag: ${e.tags.join(", ") || "-"}\n\n${e.content}\n`;
+}
+
+/** Hasilkan isi src/data/published.ts agar tulisan admin tampil publik. */
+export function toPublishedTs(entries: Entry[], memories: Memory[]) {
+  const header = `import type { Entry, Memory } from "../types";\n\n/**\n * Konten publik: inilah yang dibaca semua pengunjung situs.\n * Admin menulis lewat mode admin di browser, lalu mengekspor\n * "file publikasi" dan mengganti file ini agar tulisan tampil\n * untuk semua orang setelah deploy ulang.\n */\n`;
+  return (
+    header +
+    `export const PUBLISHED_ENTRIES: Entry[] = ${JSON.stringify(entries, null, 2)};\n\n` +
+    `export const PUBLISHED_MEMORIES: Memory[] = ${JSON.stringify(memories, null, 2)};\n`
+  );
 }
 
 export function download(filename: string, text: string, mime = "text/plain") {
