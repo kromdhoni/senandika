@@ -285,9 +285,9 @@ export default function App() {
       <div className="min-h-screen">
         <Waves />
         <div className="no-print mx-auto flex max-w-2xl items-center justify-between gap-2 px-5 py-4">
-          <button onClick={() => setImmersive(false)} className="btn-ghost px-4 py-2 text-sm">
-            ← Kembali
-          </button>
+          <IconBtn label="Kembali" onClick={() => setImmersive(false)}>
+            {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
+          </IconBtn>
           <span className="flex items-center gap-2" role="group" aria-label="Ukuran huruf">
             <IconBtn label="Perkecil huruf" onClick={() => changeFontScale(-1)}>
               <span className="font-semibold" style={{ fontSize: "11px" }}>A</span>
@@ -640,6 +640,11 @@ export default function App() {
 
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
+            <div className="no-print mb-4">
+              <IconBtn label="Kembali ke Koleksi" onClick={() => setView("senandika")}>
+                {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
+              </IconBtn>
+            </div>
             <h2 className="font-display mt-2 text-4xl font-medium md:text-5xl">{active.title || "Tanpa judul"}</h2>
             <p className="mt-3 text-sm opacity-60">
               {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
