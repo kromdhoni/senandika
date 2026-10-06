@@ -246,7 +246,6 @@ export default function App() {
   }, [view]);
 
   const nav: { id: View; label: string }[] = [
-    { id: "dashboard", label: "Beranda" },
     { id: "senandika", label: "Koleksi" },
     { id: "kenangan", label: "Kenangan" },
     { id: "timeline", label: "Timeline" },
@@ -262,13 +261,6 @@ export default function App() {
   const olderEntry = activeIndex >= 0 && activeIndex < sortedAll.length - 1 ? sortedAll[activeIndex + 1] : null;
 
   const favList = filtered.filter((e) => e.isFavorite);
-
-  const larikHariIni = useMemo(() => {
-    const poems = entries.filter((e) => e.type === "POEM");
-    if (poems.length === 0) return null;
-    const day = Math.floor(Date.now() / 86400000);
-    return poems[day % poems.length];
-  }, [entries]);
 
   function changeFontScale(d: number) {
     setFontScale((prev) => {
@@ -403,7 +395,7 @@ export default function App() {
                 </p>
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:justify-start sm:justify-center">
                   <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca →</button>
-                  <button onClick={() => setView("dashboard")} className="btn-ghost">Lihat Isinya</button>
+                  <button onClick={() => setView("tentang")} className="btn-ghost">Tentang Senandika</button>
                 </div>
                 <p className="mt-8 hidden items-center gap-2 text-xs opacity-50 md:flex" aria-hidden="true">
                   <span className="inline-block h-8 w-5 rounded-full border" style={{ borderColor: "var(--line)" }} />
@@ -446,20 +438,6 @@ export default function App() {
               </div>
             )}
 
-            {larikHariIni && (
-              <Reveal className="mx-auto mt-12 max-w-xl">
-                <button onClick={() => openEntry(larikHariIni.id)} className="card card-lift block w-full p-7 text-center">
-                  <span className="eyebrow">Larik hari ini</span>
-                  <span className="font-quote mt-3 block text-2xl italic md:text-[1.7rem]">
-                    {larikHariIni.content.split("\n").slice(0, 3).join(" / ")}
-                  </span>
-                  <span className="mt-3 block text-xs uppercase tracking-[0.2em] opacity-60">
-                    {larikHariIni.title || "Tanpa judul"} — baca selengkapnya
-                  </span>
-                </button>
-              </Reveal>
-            )}
-
             {entries[0] && (
               <button onClick={() => openEntry(entries[0].id)} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
                 <span className="quote-mark" aria-hidden="true">“</span>
@@ -472,22 +450,6 @@ export default function App() {
                 </span>
               </button>
             )}
-
-            <Reveal className="mt-14">
-            <div className="stagger grid gap-4 text-left sm:grid-cols-2" style={{ ["--i" as string]: 0 }}>
-              {[
-                ["Surat", "Ditulis untuk seseorang, meskipun tidak pernah dikirim."],
-                ["Kenangan", "Cerita dan momen yang tidak ingin dilupakan."],
-                ["Doa", "Harapan yang dititipkan pada waktu."],
-                ["Timeline", "Perjalanan cerita, dirangkai berdasarkan waktu."],
-              ].map(([t, d], i) => (
-                <div key={t} className="card card-lift p-5" style={{ ["--i" as string]: i }}>
-                  <h3 className="font-display text-lg font-semibold">{t}</h3>
-                  <p className="mt-1 text-sm opacity-75">{d}</p>
-                </div>
-              ))}
-            </div>
-            </Reveal>
 
             <Reveal>
             <figure className="mx-auto mt-14 max-w-xl">
@@ -857,7 +819,7 @@ export default function App() {
               <AdminLogin
                 onSuccess={() => {
                   setAdmin(true);
-                  setView("dashboard");
+                  setView("senandika");
                 }}
               />
             ) : (
@@ -933,9 +895,8 @@ export default function App() {
       </footer>
 
       <nav className="fixed inset-x-0 bottom-0 z-10 border-t md:hidden" style={{ background: "var(--surface)" }} aria-label="Navigasi seluler">
-        <div className={`grid text-xs ${admin ? "grid-cols-5" : "grid-cols-5"}`}>
+        <div className="grid grid-cols-4 text-xs">
           {[
-            { id: "dashboard", label: "Beranda" },
             { id: "senandika", label: "Koleksi" },
             ...(admin
               ? [{ id: "tulis", label: "+ Tulis" }]
