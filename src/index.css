@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #f7f4ee;
-  --color-surface: #ffffff;
-  --color-cocoa: #292522;
-  --color-taupe: #8c7770;
+  --color-cream: #ffffff;
+  --color-surface: #f5f5f7;
+  --color-cocoa: #1d1d1f;
+  --color-taupe: #6e6e73;
   --color-clay: #b08762;
   --color-olive: #7d9069;
-  --color-linen: #b4aba0;
-  --color-ink: #292522;
-  --color-muted: #756e69;
+  --color-linen: #d2d2d7;
+  --color-ink: #1d1d1f;
+  --color-muted: #6e6e73;
   --color-night: #171514;
   --color-nightsurface: #211f1d;
   --color-sand: #d8c3b8;
@@ -32,21 +32,21 @@
   --text: var(--color-ink);
   --muted: var(--color-muted);
   --radius: 16px;
-  --shadow-soft: 0 12px 32px -16px rgb(92 75 69 / 0.22);
-  --shadow-lift: 0 20px 44px -20px rgb(92 75 69 / 0.32);
+  --shadow-soft: none;
+  --shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.22);
   color-scheme: light;
 }
 
 .dark {
-  --bg: var(--color-night);
-  --surface: var(--color-nightsurface);
-  --primary: var(--color-sand);
-  --secondary: var(--color-moonmuted);
+  --bg: #000000;
+  --surface: #1d1d1f;
+  --primary: #f5f5f7;
+  --secondary: #a1a1a6;
   --accent: var(--color-ember);
-  --text: var(--color-moontext);
-  --muted: var(--color-moonmuted);
-  --shadow-soft: 0 12px 32px -16px rgb(0 0 0 / 0.5);
-  --shadow-lift: 0 20px 44px -20px rgb(0 0 0 / 0.6);
+  --text: #f5f5f7;
+  --muted: #a1a1a6;
+  --shadow-soft: none;
+  --shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.7);
   color-scheme: dark;
 }
 
@@ -61,8 +61,8 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   background:
-    radial-gradient(720px 420px at 12% -80px, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
-    radial-gradient(640px 400px at 88% 8%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    radial-gradient(720px 420px at 12% -80px, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    radial-gradient(640px 400px at 88% 8%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 70%),
     var(--bg);
   background-attachment: fixed;
 }
@@ -103,9 +103,10 @@ body::before {
 }
 
 .prose-read {
-  max-width: 720px;
-  line-height: 1.85;
-  font-size: 1.075rem;
+  max-width: 700px;
+  line-height: 1.9;
+  font-size: 1.125rem;
+  text-wrap: pretty;
 }
 
 .dropcap::first-letter {
@@ -133,7 +134,7 @@ body::before {
 
 .input {
   width: 100%;
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
   border-radius: 10px;
   padding: 0.65rem 0.85rem;

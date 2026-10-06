@@ -2,13 +2,11 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ENTRY_TYPES,
   ENTRY_TYPE_LABELS,
-  MOODS,
   RECIPIENTS,
   type Capsule,
   type Entry,
   type EntryType,
   type Memory,
-  type Mood,
   type Recipient,
   type View,
 } from "./types";
@@ -28,19 +26,6 @@ import {
   toPublishedTs,
   uid,
 } from "./lib/store";
-
-const MOOD_COLORS: Record<string, string> = {
-  Bahagia: "#D9A441",
-  Rindu: "#B88A72",
-  Sedih: "#7C8DA6",
-  Bersyukur: "#7FB069",
-  Tenang: "#8FB8B5",
-  Takut: "#9B8AC4",
-  Marah: "#C96F5A",
-  Haru: "#D48BB0",
-  Bingung: "#A9A19C",
-  Berharap: "#6FA8DC",
-};
 
 const TYPE_COVER: Record<EntryType, string> = {
   LETTER: "linear-gradient(120deg, #7d9069, #b08762)",
@@ -102,16 +87,6 @@ function loadFontScale() {
   return Number.isFinite(v) ? Math.min(2, Math.max(-1, v)) : 0;
 }
 
-function MoodTag({ mood }: { mood: string }) {
-  if (!mood) return null;
-  return (
-    <span className="chip">
-      <span className="mood-dot" style={{ background: MOOD_COLORS[mood] ?? "var(--accent)" }} />
-      {mood}
-    </span>
-  );
-}
-
 export default function App() {
   const { entries, setEntries, memories, setMemories, capsules, setCapsules } = useSenandika();
   const [view, setView] = useState<View>("landing");
@@ -167,16 +142,6 @@ export default function App() {
       })
       .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
   }, [entries, query]);
-
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { Ayah: 0, Ibu: 0, Diriku: 0 };
-    for (const e of entries) {
-      if (e.recipient === "Ayah") c.Ayah += 1;
-      else if (e.recipient === "Ibu") c.Ibu += 1;
-      else if (e.recipient === "Diriku") c.Diriku += 1;
-    }
-    return c;
-  }, [entries]);
 
   const kapsulInfo = useMemo(() => {
     const today = new Date();
@@ -346,7 +311,7 @@ export default function App() {
         </div>
         <article key={active.id} className="fade-in mx-auto max-w-2xl px-5 pb-20 pt-4">
           <p className="flex flex-wrap items-center justify-center gap-2 text-center text-xs uppercase tracking-widest opacity-60">
-            {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient} <MoodTag mood={active.mood} />
+            {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient}
           </p>
           <h1 className="font-display mt-3 text-center text-4xl font-medium md:text-5xl">
             {active.title || "Tanpa judul"}
@@ -496,7 +461,6 @@ export default function App() {
                   {entries[0].content.slice(0, 140)}{entries[0].content.length > 140 ? "…" : ""}
                 </span>
                 <span className="mt-4 flex items-center gap-2">
-                  <MoodTag mood={entries[0].mood} />
                   <span className="text-xs opacity-60">Untuk {entries[0].recipient}</span>
                 </span>
               </button>
@@ -550,7 +514,6 @@ export default function App() {
                   <span className="mt-2 flex flex-wrap items-center gap-2 text-sm opacity-70">
                     {new Date(entries[0].updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                     <span>· Untuk {entries[0].recipient}</span>
-                    <MoodTag mood={entries[0].mood} />
                   </span>
                 </button>
               ) : (
@@ -562,15 +525,7 @@ export default function App() {
                 <h3 className="eyebrow">Kenangan</h3>
                 <p className="font-display mt-2 text-3xl">{memories.length} <span className="text-lg opacity-60">cerita</span></p>
               </button>
-              <div className="card p-6">
-                <h3 className="eyebrow">Ditujukan kepada</h3>
-                <p className="mt-2 flex flex-wrap gap-2 text-sm">
-                  <span className="chip">Ayah · {counts.Ayah}</span>
-                  <span className="chip">Ibu · {counts.Ibu}</span>
-                  <span className="chip">Diriku · {counts.Diriku}</span>
-                </p>
-              </div>
-              <button onClick={() => setView("kapsul")} className="card card-lift p-6 text-left sm:col-span-2">
+              <button onClick={() => setView("kapsul")} className="card card-lift p-6 text-left">
                 <h3 className="eyebrow">Kapsul waktu</h3>
                 <p className="font-display mt-2 text-2xl">
                   {kapsulInfo.locked > 0
@@ -619,7 +574,7 @@ export default function App() {
                   <div className="p-5">
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-                      {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient} <MoodTag mood={e.mood} />
+                      {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient}
                     </span>
                     <span className="font-display mt-1 block text-xl">{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, 120)}{e.content.length > 120 ? "…" : ""}</span>
@@ -666,7 +621,7 @@ export default function App() {
               onChange={(e) => setDraft({ ...draft, title: e.target.value })}
               aria-label="Judul"
             />
-            <div className="mt-2 grid gap-3 sm:grid-cols-3">
+            <div className="mt-2 grid gap-3 sm:grid-cols-2">
               <label className="text-sm">Penerima
                 <select className="input mt-1" value={draft.recipient} onChange={(e) => setDraft({ ...draft, recipient: e.target.value as Recipient })}>
                   {RECIPIENTS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -675,12 +630,6 @@ export default function App() {
               <label className="text-sm">Jenis
                 <select className="input mt-1" value={draft.type} onChange={(e) => setDraft({ ...draft, type: e.target.value as EntryType })}>
                   {ENTRY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </label>
-              <label className="text-sm">Mood
-                <select className="input mt-1" value={draft.mood} onChange={(e) => setDraft({ ...draft, mood: e.target.value as Mood | "" })}>
-                  <option value="">—</option>
-                  {MOODS.map((m) => <option key={m} value={m}>{m}</option>)}
                 </select>
               </label>
             </div>
@@ -727,7 +676,7 @@ export default function App() {
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
             <p className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-              {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient} <MoodTag mood={active.mood} />
+              {ENTRY_TYPE_LABELS[active.type]} · Untuk {active.recipient}
             </p>
             <h2 className="font-display mt-2 text-4xl font-medium md:text-5xl">{active.title || "Tanpa judul"}</h2>
             <p className="mt-3 text-sm opacity-60">
@@ -1293,7 +1242,7 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
                 <span>
                   <span className="font-display block text-lg">{e.title || "Tanpa judul"}</span>
                   <span className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-60">
-                    Untuk {e.recipient} <MoodTag mood={e.mood} />
+                    Untuk {e.recipient}
                   </span>
                 </span>
               </button>
