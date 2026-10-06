@@ -42,6 +42,15 @@ const MOOD_COLORS: Record<string, string> = {
   Berharap: "#6FA8DC",
 };
 
+const TYPE_COVER: Record<EntryType, string> = {
+  LETTER: "linear-gradient(120deg, #7d9069, #b08762)",
+  JOURNAL: "linear-gradient(120deg, #b08762, #7d9069)",
+  MEMORY: "linear-gradient(120deg, #7d9069, #4c5b43)",
+  PRAYER: "linear-gradient(120deg, #b08762, #d9b48f)",
+  POEM: "linear-gradient(120deg, #8c7770, #b08762)",
+  NOTE: "linear-gradient(120deg, #b4aba0, #7d9069)",
+};
+
 const emptyDraft = (): Entry => ({
   id: uid("e"),
   title: "",
@@ -87,6 +96,7 @@ export default function App() {
   const [theme, setThemeState] = useState<"light" | "dark">(getTheme());
   const [admin, setAdmin] = useState(isAdmin());
   const [immersive, setImmersive] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -142,9 +152,14 @@ export default function App() {
     return c;
   }, [entries]);
 
-  function openNew() {
+  function openNew(preset?: EntryType) {
     if (!admin) return;
-    setDraft(emptyDraft());
+    if (!preset) {
+      setSheetOpen(true);
+      return;
+    }
+    setSheetOpen(false);
+    setDraft({ ...emptyDraft(), type: preset });
     setSaveState("idle");
     setView("tulis");
   }
@@ -321,13 +336,13 @@ export default function App() {
               {theme === "dark" ? "Terang" : "Gelap"}
             </button>
             {admin && (
-              <button onClick={openNew} className="btn-primary ml-2 px-5 py-2 text-sm">
+              <button onClick={() => openNew()} className="btn-primary ml-2 px-5 py-2 text-sm">
                 + Tulis
               </button>
             )}
           </nav>
           {admin ? (
-            <button onClick={openNew} className="btn-primary px-4 py-2 text-sm md:hidden">
+            <button onClick={() => openNew()} className="btn-primary px-4 py-2 text-sm md:hidden">
               + Tulis
             </button>
           ) : (
@@ -340,17 +355,43 @@ export default function App() {
 
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 md:pb-16">
         {view === "landing" && (
-          <section className="fade-in mx-auto max-w-3xl py-10 text-center md:py-16">
-            <p className="eyebrow">Ruang personal · privat · tenang</p>
-            <h1 className="font-display mt-4 text-4xl font-medium md:text-6xl">
-              Ada kata yang belum sempat <span className="accent-word">terucap.</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg opacity-80">
-              Senandika adalah rumah bagi surat, kenangan, dan doa — ditulis dengan tenang, disimpan dengan kasih.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca</button>
-              <button onClick={() => setView("dashboard")} className="btn-ghost">Lihat Isinya</button>
+          <section className="fade-in mx-auto max-w-5xl py-10 md:py-16">
+            <div className="grid items-center gap-10 md:grid-cols-2">
+              <div className="text-center md:text-left">
+                <p className="eyebrow">Ruang personal · privat · tenang</p>
+                <h1 className="font-display mt-4 text-4xl font-medium md:text-6xl">
+                  Ada kata yang belum sempat <span className="accent-word">terucap.</span>
+                </h1>
+                <p className="mx-auto mt-5 max-w-xl text-lg opacity-80 md:mx-0">
+                  Senandika adalah rumah bagi surat, kenangan, dan doa — ditulis dengan tenang, disimpan dengan kasih.
+                </p>
+                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:justify-start sm:justify-center">
+                  <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca →</button>
+                  <button onClick={() => setView("dashboard")} className="btn-ghost">Lihat Isinya</button>
+                </div>
+                <p className="mt-8 hidden items-center gap-2 text-xs opacity-50 md:flex" aria-hidden="true">
+                  <span className="inline-block h-8 w-5 rounded-full border" style={{ borderColor: "var(--line)" }} />
+                  Gulir untuk menjelajah
+                </p>
+              </div>
+              <div className="relative mx-auto w-full max-w-sm px-6 pb-8 pt-4">
+                <div className="arch absolute inset-0" aria-hidden="true" />
+                <svg className="absolute -left-2 bottom-6 w-24 opacity-80" viewBox="0 0 100 140" fill="none" stroke="var(--leaf)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M50 130 C50 90 50 50 50 12" />
+                  <ellipse cx="34" cy="100" rx="14" ry="6" transform="rotate(-30 34 100)" fill="var(--leaf)" opacity="0.35" stroke="none" />
+                  <ellipse cx="66" cy="82" rx="14" ry="6" transform="rotate(30 66 82)" fill="var(--leaf)" opacity="0.35" stroke="none" />
+                  <ellipse cx="34" cy="62" rx="14" ry="6" transform="rotate(-30 34 62)" fill="var(--leaf)" opacity="0.35" stroke="none" />
+                  <ellipse cx="66" cy="42" rx="12" ry="5" transform="rotate(30 66 42)" fill="var(--leaf)" opacity="0.35" stroke="none" />
+                  <circle cx="50" cy="12" r="4" fill="var(--accent)" stroke="none" />
+                </svg>
+                <div className="polaroid float-soft relative p-6 pt-9">
+                  <span className="tape" aria-hidden="true" />
+                  <p className="font-quote text-xl italic">
+                    “Beberapa hal tidak harus dikatakan, cukup dituliskan.”
+                  </p>
+                  <p className="mt-3 text-xs uppercase tracking-[0.2em] opacity-50">Senandika · catatan hari ini</p>
+                </div>
+              </div>
             </div>
 
             {marqueeLines.length > 0 && (
@@ -419,7 +460,7 @@ export default function App() {
             <p className="mt-2 opacity-75">
               {admin ? "Hari ini, apa yang ingin kamu ceritakan?" : "Kumpulan tulisan dan kenangan pilihan pemilik rumah ini."}
             </p>
-            {admin && <button onClick={openNew} className="btn-primary mt-5">+ Tulis Senandika</button>}
+            {admin && <button onClick={() => openNew()} className="btn-primary mt-5">+ Tulis Senandika</button>}
             <div className="card card-lift mt-8 p-6">
               <h3 className="eyebrow">Senandika terbaru</h3>
               {entries[0] ? (
@@ -463,7 +504,7 @@ export default function App() {
                 <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">{view === "favorit" ? "Favorit" : "Senandika"}</h2>
               </div>
               {admin && (
-                <button onClick={openNew} className="btn-primary hidden px-5 py-2 text-sm sm:block">+ Tulis</button>
+                <button onClick={() => openNew()} className="btn-primary hidden px-5 py-2 text-sm sm:block">+ Tulis</button>
               )}
             </div>
             <p className="mt-2 text-sm opacity-70">
@@ -493,7 +534,9 @@ export default function App() {
             </div>
             <div className="stagger mt-6 grid gap-3">
               {(view === "favorit" ? favList : filtered).map((e, i) => (
-                <article key={e.id} className="card card-lift p-5" style={{ ["--i" as string]: Math.min(i, 6) }}>
+                <article key={e.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
+                  <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
+                  <div className="p-5">
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest opacity-60">
                       {ENTRY_TYPE_LABELS[e.type]} · Untuk {e.recipient} <MoodTag mood={e.mood} />
@@ -507,6 +550,7 @@ export default function App() {
                     </button>
                     {admin && <button onClick={() => openEdit(e)} className="underline underline-offset-4">Ubah</button>}
                   </div>
+                  </div>
                 </article>
               ))}
               {(view === "favorit" ? favList : filtered).length === 0 && (
@@ -515,7 +559,7 @@ export default function App() {
                   <p className="mt-1 text-sm opacity-70">
                     {admin ? "Mungkin ada sesuatu yang ingin kamu tuliskan hari ini." : "Koleksi ini masih disiapkan pemiliknya. Kembali lagi nanti."}
                   </p>
-                  {admin && <button onClick={openNew} className="btn-primary mt-4">Mulai Menulis</button>}
+                  {admin && <button onClick={() => openNew()} className="btn-primary mt-4">Mulai Menulis</button>}
                 </div>
               )}
             </div>
@@ -686,7 +730,7 @@ export default function App() {
                   ekspor file publikasi lalu ganti <code>src/data/published.ts</code> di repo dan push.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button onClick={openNew} className="btn-primary px-5 py-2 text-sm">+ Tulis Senandika</button>
+                  <button onClick={() => openNew()} className="btn-primary px-5 py-2 text-sm">+ Tulis Senandika</button>
                   <button
                     onClick={() => download("published.ts", toPublishedTs(entries, memories), "text/plain")}
                     className="btn-ghost px-5 py-2 text-sm"
@@ -758,18 +802,93 @@ export default function App() {
               : [{ id: "timeline", label: "Timeline" }]),
             { id: "kenangan", label: "Kenangan" },
             { id: "pengaturan", label: "Saya" },
-          ].map((n) => (
-            <button
-              key={n.id}
-              onClick={() => (n.id === "tulis" ? openNew() : setView(n.id as View))}
-              className={`py-3 ${view === n.id ? "font-bold" : "opacity-70"}`}
-            >
-              {n.label}
+          ].map((n) =>
+            n.id === "tulis" ? (
+              <button key={n.id} onClick={() => openNew()} className="flex justify-center" aria-label="Tulis baru">
+                <span className="fab-center" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M12 5v14 M5 12h14" />
+                  </svg>
+                </span>
+              </button>
+            ) : (
+              <button
+                key={n.id}
+                onClick={() => setView(n.id as View)}
+                className={`py-3 ${view === n.id ? "font-bold" : "opacity-70"}`}
+              >
+                {n.label}
+              </button>
+            ),
+          )}
+        </div>
+      </nav>
+
+      {sheetOpen && admin && (
+        <WriteSheet
+          onPick={(t) => openNew(t)}
+          onMemory={() => {
+            setSheetOpen(false);
+            setView("kenangan");
+          }}
+          onClose={() => setSheetOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function WriteSheet({
+  onPick,
+  onMemory,
+  onClose,
+}: {
+  onPick: (t: EntryType) => void;
+  onMemory: () => void;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const close = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [onClose]);
+
+  const icon = (d: string) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+
+  const options: { label: string; desc: string; art: string; act: () => void }[] = [
+    { label: "Surat", desc: "Tuliskan perasaan terdalam", art: "M3 7h18v10H3z M3 7l9 6 9-6", act: () => onPick("LETTER") },
+    { label: "Jurnal", desc: "Catat hari-harimu", art: "M6 3h12v18H6z M9 8h6 M9 12h6 M9 16h4", act: () => onPick("JOURNAL") },
+    { label: "Puisi", desc: "Rangkai kata yang puitis", art: "M20 4c-6 0-12 4-14 12l-2 4 4-2C16 16 20 10 20 4z M6 18L16 8", act: () => onPick("POEM") },
+    { label: "Doa", desc: "Titipkan harapan dan doa", art: "M12 3c3 4 6 6 6 11a6 6 0 0 1-12 0c0-5 3-7 6-11z", act: () => onPick("PRAYER") },
+    { label: "Kenangan", desc: "Simpan momen berharga", art: "M3 7h18v12H3z M9 11a1.6 1.6 0 1 0 0 0 M3 17l5-4 4 3 4-4 5 5", act: onMemory },
+    { label: "Catatan", desc: "Hal kecil yang berarti", art: "M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h3", act: () => onPick("NOTE") },
+  ];
+
+  return (
+    <>
+      <button className="sheet-overlay" onClick={onClose} aria-label="Tutup pilihan menulis" />
+      <div className="sheet p-5 pb-8" role="dialog" aria-modal="true" aria-label="Apa yang ingin kamu tulis?">
+        <div className="mx-auto mb-4 h-1 w-12 rounded-full" style={{ background: "var(--line)" }} />
+        <h3 className="font-display text-xl">Apa yang ingin kamu tulis?</h3>
+        <div className="mt-4 grid gap-2">
+          {options.map((o) => (
+            <button key={o.label} onClick={o.act} className="sheet-option">
+              <span className="sheet-icon">{icon(o.art)}</span>
+              <span>
+                <span className="block font-semibold">{o.label}</span>
+                <span className="block text-xs opacity-60">{o.desc}</span>
+              </span>
             </button>
           ))}
         </div>
-      </nav>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -916,11 +1035,16 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
           <h3 className="eyebrow">{label}</h3>
           <div className="timeline-rail mt-3 space-y-3 border-l-2 pl-6" style={{ borderColor: "color-mix(in srgb, var(--accent) 55%, transparent)" }}>
             {list.map((e) => (
-              <button key={e.id} onClick={() => onOpen(e.id)} className="card card-lift relative block w-full p-4 text-left">
+              <button key={e.id} onClick={() => onOpen(e.id)} className="card card-lift relative flex w-full items-center gap-3 p-4 text-left">
                 <span className="timeline-dot" aria-hidden="true" />
-                <span className="font-display text-lg">{e.title || "Tanpa judul"}</span>
-                <span className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-60">
-                  Untuk {e.recipient} <MoodTag mood={e.mood} />
+                <span className="mono-thumb" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true">
+                  {(e.title || "S").charAt(0)}
+                </span>
+                <span>
+                  <span className="font-display block text-lg">{e.title || "Tanpa judul"}</span>
+                  <span className="mt-1 flex flex-wrap items-center gap-2 text-xs opacity-60">
+                    Untuk {e.recipient} <MoodTag mood={e.mood} />
+                  </span>
                 </span>
               </button>
             ))}
