@@ -4,6 +4,7 @@ import {
   ENTRY_TYPE_LABELS,
   MOODS,
   RECIPIENTS,
+  type Capsule,
   type Entry,
   type EntryType,
   type Memory,
@@ -50,6 +51,24 @@ const TYPE_COVER: Record<EntryType, string> = {
   NOTE: "linear-gradient(120deg, #b4aba0, #7d9069)",
 };
 
+function todayLocal() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isCapsuleOpen(k: Capsule) {
+  return new Date(`${k.openDate}T00:00:00`) <= todayLocal();
+}
+
+function daysUntilOpen(k: Capsule) {
+  return Math.ceil((new Date(`${k.openDate}T00:00:00`).getTime() - todayLocal().getTime()) / 86400000);
+}
+
+function formatDateLong(iso: string) {
+  return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+}
+
 const emptyDraft = (): Entry => ({
   id: uid("e"),
   title: "",
@@ -66,12 +85,21 @@ const emptyDraft = (): Entry => ({
 });
 
 function useSenandika() {
-  const [entries, setEntries] = useState<Entry[]>(() => load().entries);
-  const [memories, setMemories] = useState<Memory[]>(() => load().memories);
+  const initial = useMemo(load, []);
+  const [entries, setEntries] = useState<Entry[]>(initial.entries);
+  const [memories, setMemories] = useState<Memory[]>(initial.memories);
+  const [capsules, setCapsules] = useState<Capsule[]>(initial.capsules);
   useEffect(() => {
-    save({ entries, memories });
-  }, [entries, memories]);
-  return { entries, setEntries, memories, setMemories };
+    save({ entries, memories, capsules });
+  }, [entries, memories, capsules]);
+  return { entries, setEntries, memories, setMemories, capsules, setCapsules };
+}
+
+const FONT_KEY = "senandika.fontscale";
+
+function loadFontScale() {
+  const v = Number(localStorage.getItem(FONT_KEY));
+  return Number.isFinite(v) ? Math.min(2, Math.max(-1, v)) : 0;
 }
 
 function MoodTag({ mood }: { mood: string }) {
@@ -85,7 +113,7 @@ function MoodTag({ mood }: { mood: string }) {
 }
 
 export default function App() {
-  const { entries, setEntries, memories, setMemories } = useSenandika();
+  const { entries, setEntries, memories, setMemories, capsules, setCapsules } = useSenandika();
   const [view, setView] = useState<View>("landing");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Entry>(emptyDraft);
@@ -95,6 +123,7 @@ export default function App() {
   const [admin, setAdmin] = useState(isAdmin());
   const [immersive, setImmersive] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [fontScale, setFontScale] = useState(loadFontScale);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -149,6 +178,14 @@ export default function App() {
     return c;
   }, [entries]);
 
+  const kapsulInfo = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const locked = capsules.filter((k) => new Date(`${k.openDate}T00:00:00`) > today);
+    const next = [...locked].sort((a, b) => a.openDate.localeCompare(b.openDate))[0];
+    return { locked: locked.length, opened: capsules.length - locked.length, next };
+  }, [capsules]);
+
   function openNew(preset?: EntryType) {
     if (!admin) return;
     if (!preset) {
@@ -197,6 +234,7 @@ export default function App() {
     const fresh = resetToPublished();
     setEntries(fresh.entries);
     setMemories(fresh.memories);
+    setCapsules(fresh.capsules);
   }
 
   function entryUrl(id: string) {
@@ -247,6 +285,7 @@ export default function App() {
     { id: "senandika", label: "Senandika" },
     { id: "kenangan", label: "Kenangan" },
     { id: "timeline", label: "Timeline" },
+    { id: "kapsul", label: "Kapsul" },
   ];
 
   const sortedAll = useMemo(
@@ -259,6 +298,27 @@ export default function App() {
 
   const favList = filtered.filter((e) => e.isFavorite);
 
+  const larikHariIni = useMemo(() => {
+    const poems = entries.filter((e) => e.type === "POEM");
+    if (poems.length === 0) return null;
+    const day = Math.floor(Date.now() / 86400000);
+    return poems[day % poems.length];
+  }, [entries]);
+
+  function changeFontScale(d: number) {
+    setFontScale((prev) => {
+      const next = Math.min(2, Math.max(-1, prev + d));
+      try {
+        localStorage.setItem(FONT_KEY, String(next));
+      } catch {
+        /* abaikan */
+      }
+      return next;
+    });
+  }
+
+  const proseStyle = { fontSize: `calc(1.075rem + ${fontScale * 0.125}rem)` };
+
   const marqueeLines = useMemo(
     () => entries.filter((e) => e.type === "POEM").slice(0, 8).map((e) => e.content.split("\n")[0]),
     [entries],
@@ -268,10 +328,14 @@ export default function App() {
     return (
       <div className="min-h-screen">
         <Waves />
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
+        <div className="no-print mx-auto flex max-w-2xl items-center justify-between gap-2 px-5 py-4">
           <button onClick={() => setImmersive(false)} className="btn-ghost px-4 py-2 text-sm">
             ← Kembali
           </button>
+          <span className="chip" role="group" aria-label="Ukuran huruf">
+            <button onClick={() => changeFontScale(-1)} aria-label="Perkecil huruf" className="px-1">A-</button>
+            <button onClick={() => changeFontScale(1)} aria-label="Perbesar huruf" className="px-1">A+</button>
+          </span>
           <span className="font-display text-sm opacity-70">
             Senandika<span style={{ color: "var(--accent)" }}>.</span>
           </span>
@@ -288,12 +352,12 @@ export default function App() {
             {active.tags.length > 0 && ` · ${active.tags.join(" · ")}`}
           </p>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
-          <div className="prose-read dropcap whitespace-pre-wrap">{active.content}</div>
+          <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
-          <div className="flex justify-center">
+          <div className="no-print flex justify-center">
             <SharePanel entry={active} url={entryUrl(active.id)} />
           </div>
-          <nav className="mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
+          <nav className="no-print mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
             {newerEntry ? (
               <button onClick={() => openEntry(newerEntry.id, true)} className="btn-ghost px-4 py-2">
                 ← Lebih baru
@@ -406,6 +470,20 @@ export default function App() {
               </div>
             )}
 
+            {larikHariIni && (
+              <Reveal className="mx-auto mt-12 max-w-xl">
+                <button onClick={() => openEntry(larikHariIni.id)} className="card card-lift block w-full p-7 text-center">
+                  <span className="eyebrow">Larik hari ini</span>
+                  <span className="font-quote mt-3 block text-2xl italic md:text-[1.7rem]">
+                    {larikHariIni.content.split("\n").slice(0, 3).join(" / ")}
+                  </span>
+                  <span className="mt-3 block text-xs uppercase tracking-[0.2em] opacity-60">
+                    {larikHariIni.title || "Tanpa judul"} — baca selengkapnya
+                  </span>
+                </button>
+              </Reveal>
+            )}
+
             {entries[0] && (
               <button onClick={() => openEntry(entries[0].id)} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
                 <span className="quote-mark" aria-hidden="true">“</span>
@@ -488,6 +566,19 @@ export default function App() {
                   <span className="chip">Diriku · {counts.Diriku}</span>
                 </p>
               </div>
+              <button onClick={() => setView("kapsul")} className="card card-lift p-6 text-left sm:col-span-2">
+                <h3 className="eyebrow">Kapsul waktu</h3>
+                <p className="font-display mt-2 text-2xl">
+                  {kapsulInfo.locked > 0
+                    ? `${kapsulInfo.locked} pesan terkunci`
+                    : "Belum ada pesan untuk masa depan"}
+                </p>
+                <p className="mt-1 text-sm opacity-70">
+                  {kapsulInfo.next
+                    ? `Dibuka berikutnya: ${new Date(`${kapsulInfo.next.openDate}T00:00:00`).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`
+                    : "Tulis pesan untuk dirimu di masa depan."}
+                </p>
+              </button>
             </div>
           </section>
         )}
@@ -640,10 +731,15 @@ export default function App() {
               {active.tags.length > 0 && ` · ${active.tags.join(" · ")}`}
             </p>
             <div className="divider-orn my-6" aria-hidden="true"><span>✦</span></div>
-            <div className="prose-read dropcap whitespace-pre-wrap">{active.content}</div>
-            <div className="mt-8 flex flex-wrap items-center gap-2">
+            <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
+            <div className="no-print mt-8 flex flex-wrap items-center gap-2">
               <SharePanel entry={active} url={entryUrl(active.id)} />
               <button onClick={() => setImmersive(true)} className="btn-ghost text-sm">Layar penuh</button>
+              <button onClick={() => window.print()} className="btn-ghost text-sm">Cetak</button>
+              <span className="chip" role="group" aria-label="Ukuran huruf">
+                <button onClick={() => changeFontScale(-1)} aria-label="Perkecil huruf" className="px-1">A-</button>
+                <button onClick={() => changeFontScale(1)} aria-label="Perbesar huruf" className="px-1">A+</button>
+              </span>
               <button onClick={() => toggleFav(active.id)} className="btn-ghost text-sm">{active.isFavorite ? "★ Favorit" : "☆ Jadikan favorit"}</button>
               {admin && <button onClick={() => openEdit(active)} className="btn-ghost text-sm">Ubah</button>}
               {admin && <button onClick={() => removeEntry(active.id)} className="btn-ghost text-sm">Hapus</button>}
@@ -692,6 +788,88 @@ export default function App() {
             <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Timeline</h2>
             <p className="mt-2 text-sm opacity-70">Perjalanan cerita berdasarkan waktu.</p>
             <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
+          </section>
+        )}
+
+        {view === "kapsul" && (
+          <section className="fade-in mx-auto max-w-3xl">
+            <p className="eyebrow">Kapsul waktu</p>
+            <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Surat untuk Masa Depan</h2>
+            <p className="mt-2 text-sm opacity-70">
+              Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba.
+              Kapsul tersimpan di peramban ini saja.
+            </p>
+            {admin && <CapsuleForm onAdd={(k) => setCapsules((p) => [k, ...p])} />}
+            <div className="mt-6 grid gap-3">
+              {[...capsules]
+                .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+                .map((k) =>
+                  isCapsuleOpen(k) ? (
+                    <article key={k.id} className="card card-lift p-5">
+                      <p className="eyebrow">Dibuka {formatDateLong(`${k.openDate}T00:00:00`)}</p>
+                      <h3 className="font-display mt-1 text-xl">{k.title}</h3>
+                      <p className="prose-read mt-2 whitespace-pre-wrap text-[1rem]" dir="auto">{k.message}</p>
+                      {admin && (
+                        <button onClick={() => setCapsules((p) => p.filter((x) => x.id !== k.id))} className="mt-3 text-sm underline underline-offset-4">
+                          Hapus
+                        </button>
+                      )}
+                    </article>
+                  ) : (
+                    <div key={k.id} className="card p-5 opacity-90">
+                      <p className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <rect x="5" y="11" width="14" height="9" rx="2" />
+                          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                        </svg>
+                        Terkunci · dibuka {formatDateLong(`${k.openDate}T00:00:00`)}
+                      </p>
+                      <h3 className="font-display mt-1 text-xl">{k.title}</h3>
+                      <p className="mt-1 text-sm opacity-70">
+                        {daysUntilOpen(k) <= 0 ? "Waktunya hampir tiba." : `${daysUntilOpen(k)} hari lagi.`} Ada pesan dari masa lalu menunggumu.
+                      </p>
+                    </div>
+                  ),
+                )}
+              {capsules.length === 0 && (
+                <p className="opacity-70">
+                  {admin ? "Belum ada kapsul. Tulis pesan pertamamu untuk masa depan di atas." : "Belum ada kapsul waktu di sini."}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {view === "tentang" && (
+          <section className="fade-in mx-auto max-w-3xl">
+            <p className="eyebrow">Tentang</p>
+            <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Senandika.</h2>
+            <p className="font-quote mt-4 text-2xl italic opacity-90">
+              Tempat kata-kata yang tak sempat terucap menemukan rumah.
+            </p>
+            <div className="prose-read mt-6 space-y-4 text-[1rem] opacity-85">
+              <p>
+                Senandika adalah ruang personal untuk menulis surat, menyimpan kenangan,
+                dan mengabadikan kata-kata yang ingin disampaikan kepada orang-orang tercinta —
+                bahkan yang tak sempat dikatakan.
+              </p>
+              <p>
+                Menulis yang tak sempat dikatakan. Menyimpan yang tak ingin dilupakan.
+                Karena beberapa perasaan terlalu berarti untuk dibiarkan hilang bersama waktu.
+              </p>
+            </div>
+            <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
+            <h3 className="font-display text-2xl">Cara membaca</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm opacity-85">
+              <li>Buka <strong>Senandika</strong> untuk menjelajah semua tulisan, atau <strong>Timeline</strong> untuk menelusuri per waktu.</li>
+              <li>Ketuk tulisan untuk membaca dengan tenang. Tombol <strong>Layar penuh</strong> menyembunyikan semuanya kecuali kata-katanya.</li>
+              <li>Tombol <strong>Bagikan</strong> menyalin tautan yang langsung membuka tulisan itu.</li>
+              <li>Tandai favorit untuk menyimpan yang paling berarti di perambanmu.</li>
+            </ol>
+            <p className="mt-8 text-xs opacity-50">
+              Ditata dengan Playfair Display, Cormorant Garamond, dan Inter.
+              Diterbitkan sebagai situs statis. Tulisan pribadi bukan produk untuk dijual.
+            </p>
           </section>
         )}
 
@@ -746,7 +924,7 @@ export default function App() {
                   <button
                     onClick={() => {
                       if (window.confirm("Hapus seluruh data lokal? Tindakan ini tidak dapat dikembalikan.")) {
-                        setEntries([]); setMemories([]);
+                        setEntries([]); setMemories([]); setCapsules([]);
                       }
                     }}
                     className="btn-ghost text-sm"
@@ -768,6 +946,8 @@ export default function App() {
             <p className="text-xs opacity-60">Tempat kata-kata yang tak sempat terucap menemukan rumah.</p>
           </div>
           <div className="flex gap-2 text-sm">
+            <button onClick={() => setView("kapsul")} className="underline underline-offset-4 opacity-70">Kapsul</button>
+            <button onClick={() => setView("tentang")} className="underline underline-offset-4 opacity-70">Tentang</button>
             <button onClick={() => setView("favorit")} className="underline underline-offset-4 opacity-70">Favorit</button>
             <button onClick={() => setView("pengaturan")} className="underline underline-offset-4 opacity-70">
               {admin ? "Admin" : "Masuk admin"}
@@ -969,6 +1149,31 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       />
       {error && <p className="mt-2 text-sm" role="alert" style={{ color: "#C96F5A" }}>{error}</p>}
       <button type="submit" className="btn-primary mt-4 px-6 py-2 text-sm">Masuk</button>
+    </form>
+  );
+}
+
+function CapsuleForm({ onAdd }: { onAdd: (k: Capsule) => void }) {
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [openDate, setOpenDate] = useState("");
+  const todayStr = `${todayLocal().getFullYear()}-${String(todayLocal().getMonth() + 1).padStart(2, "0")}-${String(todayLocal().getDate()).padStart(2, "0")}`;
+  return (
+    <form
+      className="card mt-4 grid gap-3 p-5"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!title.trim() || !message.trim() || !openDate) return;
+        onAdd({ id: uid("c"), title: title.trim(), message: message.trim(), openDate, createdAt: new Date().toISOString() });
+        setTitle(""); setMessage(""); setOpenDate("");
+      }}
+    >
+      <input className="input" placeholder="Untuk diriku di masa depan…" value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Judul kapsul" />
+      <textarea className="input min-h-28" placeholder="Tulis pesan untuk masa depan…" value={message} onChange={(e) => setMessage(e.target.value)} aria-label="Pesan kapsul" />
+      <label className="grid max-w-xs gap-1 text-sm">Dibuka pada
+        <input className="input" type="date" min={todayStr} value={openDate} onChange={(e) => setOpenDate(e.target.value)} aria-label="Tanggal dibuka" />
+      </label>
+      <button type="submit" className="btn-primary w-fit px-6 py-2 text-sm">Kunci kapsul</button>
     </form>
   );
 }

@@ -372,6 +372,28 @@ body::before {
   background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
+@media print {
+  header,
+  footer,
+  nav,
+  .marquee,
+  .waves-bg,
+  .sheet-overlay,
+  .sheet,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  body::before {
+    display: none;
+  }
+  .card {
+    box-shadow: none;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }

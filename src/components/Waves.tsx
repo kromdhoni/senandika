@@ -13,7 +13,7 @@ export default function Waves() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 bottom-0 -z-10 h-[38vh] min-h-[240px] overflow-hidden"
+      className="waves-bg pointer-events-none fixed inset-x-0 bottom-0 -z-10 h-[38vh] min-h-[240px] overflow-hidden"
     >
       {LAYERS.map((l, i) => (
         <svg

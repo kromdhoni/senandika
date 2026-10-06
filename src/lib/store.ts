@@ -1,5 +1,5 @@
 import { PUBLISHED_ENTRIES, PUBLISHED_MEMORIES } from "../data/published";
-import type { Entry, Memory } from "../types";
+import type { Capsule, Entry, Memory } from "../types";
 
 /**
  * PIN admin — gerbang tulisan di situs statis (GitHub Pages).
@@ -17,12 +17,14 @@ const ADMIN_KEY = "senandika.admin";
 interface Persisted {
   entries: Entry[];
   memories: Memory[];
+  capsules: Capsule[];
 }
 
 function freshCopy(): Persisted {
   return {
     entries: JSON.parse(JSON.stringify(PUBLISHED_ENTRIES)) as Entry[],
     memories: JSON.parse(JSON.stringify(PUBLISHED_MEMORIES)) as Memory[],
+    capsules: [],
   };
 }
 
@@ -34,7 +36,13 @@ export function load(): Persisted {
       localStorage.setItem(KEY, JSON.stringify(fresh));
       return fresh;
     }
-    return JSON.parse(raw) as Persisted;
+    const data = JSON.parse(raw) as Partial<Persisted>;
+    const fresh = freshCopy();
+    return {
+      entries: Array.isArray(data.entries) ? data.entries : fresh.entries,
+      memories: Array.isArray(data.memories) ? data.memories : fresh.memories,
+      capsules: Array.isArray(data.capsules) ? data.capsules : [],
+    };
   } catch {
     return freshCopy();
   }

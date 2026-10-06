@@ -45,6 +45,14 @@ export interface Memory {
   createdAt: string;
 }
 
+export interface Capsule {
+  id: string;
+  title: string;
+  message: string;
+  openDate: string;
+  createdAt: string;
+}
+
 export type View =
   | "landing"
   | "dashboard"
@@ -54,6 +62,8 @@ export type View =
   | "kenangan"
   | "timeline"
   | "favorit"
+  | "kapsul"
+  | "tentang"
   | "pengaturan";
 
 export const RECIPIENTS: Recipient[] = [
