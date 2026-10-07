@@ -110,11 +110,15 @@ export function toMarkdownEntry(e: Entry) {
 
 /** Hasilkan isi src/data/published.ts agar tulisan admin tampil publik. */
 export function toPublishedTs(entries: Entry[], memories: Memory[]) {
-  const header = `import type { Entry, Memory } from "../types";\n\n/**\n * Konten publik: inilah yang dibaca semua pengunjung situs.\n * Admin menulis lewat mode admin di browser, lalu mengekspor\n * "file publikasi" dan mengganti file ini agar tulisan tampil\n * untuk semua orang setelah deploy ulang.\n */\n`;
+  const header = `import type { Entry, Memory } from "../types";\n\n/**\n * Konten publik: inilah yang dibaca semua pengunjung situs.\n * Admin menulis lewat mode admin di browser, lalu mengekspor\n * "file publikasi" dan mengganti file ini agar tulisan tampil\n * untuk semua orang setelah deploy ulang.\n *\n * Catatan: foto kenangan lokal tidak ikut (tetap di peramban).\n */\n`;
+  const cleanMemories = memories.map((m) => {
+    const { photo: _dropped, ...rest } = m;
+    return rest;
+  });
   return (
     header +
     `export const PUBLISHED_ENTRIES: Entry[] = ${JSON.stringify(entries, null, 2)};\n\n` +
-    `export const PUBLISHED_MEMORIES: Memory[] = ${JSON.stringify(memories, null, 2)};\n`
+    `export const PUBLISHED_MEMORIES: Memory[] = ${JSON.stringify(cleanMemories, null, 2)};\n`
   );
 }
 

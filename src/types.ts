@@ -43,6 +43,7 @@ export interface Memory {
   story: string;
   memoryDate: string;
   location: string;
+  photo?: string;
   createdAt: string;
 }
 

@@ -231,6 +231,12 @@ export default function App() {
     setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, isFavorite: !e.isFavorite } : e)));
   }
 
+  function shuffle() {
+    const pool = view === "favorit" ? favList : filtered;
+    if (pool.length === 0) return;
+    openEntry(pool[Math.floor(Math.random() * pool.length)].id);
+  }
+
   function handleReset() {
     if (!admin) return;
     if (!window.confirm("Kembalikan ke konten publikasi? Perubahan lokal yang belum dipublikasikan akan hilang.")) return;
@@ -316,6 +322,10 @@ export default function App() {
     setSpeakingId(null);
   }, [view, activeId]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [view]);
+
   const nav: { id: View; label: string }[] = [
     { id: "senandika", label: "Koleksi" },
     { id: "kenangan", label: "Kenangan" },
@@ -370,6 +380,7 @@ export default function App() {
     return (
       <div className="min-h-screen">
         <Waves />
+        <ReadingProgress />
         <div className="no-print mx-auto flex max-w-2xl items-center justify-between gap-2 px-5 py-4">
           <IconBtn label="Kembali" onClick={() => setImmersive(false)}>
             {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
@@ -695,30 +706,38 @@ export default function App() {
                   ? "Cari cerita, kenangan, atau kata yang pernah kamu tulis."
                   : "Cari cerita, kenangan, atau kata yang pernah tertulis di sini."}
             </p>
-            <input
-              className="input mt-4"
-              placeholder='Cari "ibu"'
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Pencarian tulisan"
-            />
-            <div className="stagger mt-6 grid gap-3">
-              {(view === "favorit" ? favList : filtered).map((e, i) => (
-                <article key={e.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
+            <div className="mt-4 flex gap-2">
+              <input
+                className="input"
+                placeholder='Cari "ibu"'
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Pencarian tulisan"
+              />
+              <IconBtn label="Kocok: buka tulisan acak" onClick={shuffle}>
+                {strokeIcon("M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5")}
+              </IconBtn>
+            </div>
+            <div className="stagger mt-6 grid gap-4 sm:grid-cols-2">
+              {(view === "favorit" ? favList : filtered).map((e, i) => {
+                const featured = i === 0;
+                const limit = featured ? 200 : 120;
+                return (
+                <article key={e.id} className={`card card-lift overflow-hidden${featured ? " sm:col-span-2" : ""}`} style={{ ["--i" as string]: Math.min(i, 6) }}>
                   {e.cover ? (
                     <img
                       src={`${import.meta.env.BASE_URL}${e.cover}`}
                       alt=""
                       loading="lazy"
-                      className="h-36 w-full object-cover"
+                      className={featured ? "h-56 w-full object-cover sm:h-72" : "h-36 w-full object-cover"}
                     />
                   ) : (
                     <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
                   )}
-                  <div className="p-5">
+                  <div className={featured ? "p-6 md:p-8" : "p-5"}>
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
-                    <span className="font-display mt-1 block text-xl">{e.title || "Tanpa judul"}</span>
-                    <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, 120)}{e.content.length > 120 ? "…" : ""}</span>
+                    <span className={featured ? "font-display mt-1 block text-2xl md:text-3xl" : "font-display mt-1 block text-xl"}>{e.title || "Tanpa judul"}</span>
+                    <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, limit)}{e.content.length > limit ? "…" : ""}</span>
                   </button>
                   <div className="mt-3 flex gap-3 text-sm">
                     <button onClick={() => toggleFav(e.id)} className="underline underline-offset-4" aria-label="Tandai favorit">
@@ -728,7 +747,8 @@ export default function App() {
                   </div>
                   </div>
                 </article>
-              ))}
+                );
+              })}
               {(view === "favorit" ? favList : filtered).length === 0 && (
                 <div className="card p-8 text-center">
                   <p className="font-display text-xl">Belum ada cerita di sini.</p>
@@ -816,6 +836,7 @@ export default function App() {
 
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
+            <ReadingProgress />
             <div className="no-print mb-4">
               <IconBtn label="Kembali ke Koleksi" onClick={() => setView("senandika")}>
                 {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
@@ -887,7 +908,11 @@ export default function App() {
             <div className="stagger mt-6 grid gap-4 sm:grid-cols-2">
               {memories.map((m, i) => (
                 <div key={m.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
-                  <div className="h-1.5" style={{ background: "linear-gradient(to right, var(--accent), transparent)" }} />
+                  {m.photo ? (
+                    <img src={m.photo} alt="" loading="lazy" className="h-44 w-full object-cover" />
+                  ) : (
+                    <div className="h-1.5" style={{ background: "linear-gradient(to right, var(--accent), transparent)" }} />
+                  )}
                   <div className="p-5">
                     <p className="text-xs uppercase tracking-widest opacity-60">{m.memoryDate} {m.location ? `· ${m.location}` : ""}</p>
                     <h3 className="font-display mt-1 text-xl">{m.title}</h3>
@@ -1207,6 +1232,33 @@ function strokeIcon(d: string) {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={d} />
     </svg>
+  );
+}
+
+function ReadingProgress() {
+  const [p, setP] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setP(max > 0 ? Math.min(1, h.scrollTop / max) : 0);
+      raf = 0;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+  return (
+    <div className="fixed inset-x-0 top-0 z-50 h-[3px]" aria-hidden="true">
+      <div className="h-full" style={{ width: `${p * 100}%`, background: "linear-gradient(to right, var(--accent), #7fb3d5)" }} />
+    </div>
   );
 }
 
@@ -1531,19 +1583,43 @@ function CapsuleForm({ onAdd }: { onAdd: (k: Capsule) => void }) {
   );
 }
 
+function fileToPhoto(file: File): Promise<string> {
+  return new Promise((res, rej) => {
+    const obj = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 1200;
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(img.width * s));
+      cv.height = Math.max(1, Math.round(img.height * s));
+      cv.getContext("2d")?.drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(obj);
+      res(cv.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(obj);
+      rej(new Error("gagal membaca gambar"));
+    };
+    img.src = obj;
+  });
+}
+
 function MemoryForm({ onAdd }: { onAdd: (m: Memory) => void }) {
   const [title, setTitle] = useState("");
   const [story, setStory] = useState("");
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [photoError, setPhotoError] = useState("");
   return (
     <form
       className="card mt-4 grid gap-3 p-5"
       onSubmit={(e) => {
         e.preventDefault();
         if (!title.trim()) return;
-        onAdd({ id: uid("m"), title: title.trim(), story: story.trim(), memoryDate: date || new Date().toISOString().slice(0, 10), location: location.trim(), createdAt: new Date().toISOString() });
-        setTitle(""); setStory(""); setDate(""); setLocation("");
+        onAdd({ id: uid("m"), title: title.trim(), story: story.trim(), memoryDate: date || new Date().toISOString().slice(0, 10), location: location.trim(), photo: photo || undefined, createdAt: new Date().toISOString() });
+        setTitle(""); setStory(""); setDate(""); setLocation(""); setPhoto("");
       }}
     >
       <input className="input" placeholder="Judul kenangan…" value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Judul kenangan" />
@@ -1552,6 +1628,31 @@ function MemoryForm({ onAdd }: { onAdd: (m: Memory) => void }) {
         <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Tanggal kenangan" />
         <input className="input" placeholder="Lokasi (opsional)" value={location} onChange={(e) => setLocation(e.target.value)} aria-label="Lokasi" />
       </div>
+      <label className="grid gap-1 text-sm">Foto (opsional, tersimpan di peramban ini)
+        <input
+          className="input"
+          type="file"
+          accept="image/*"
+          aria-label="Foto kenangan"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            setPhotoError("");
+            if (f.size > 8 * 1024 * 1024) {
+              setPhotoError("Fotonya kebesaran (maks 8MB).");
+              return;
+            }
+            fileToPhoto(f).then(setPhoto).catch(() => setPhotoError("Foto gagal dibaca."));
+          }}
+        />
+      </label>
+      {photoError && <p className="text-sm" role="alert" style={{ color: "#C96F5A" }}>{photoError}</p>}
+      {photo && (
+        <div className="flex items-center gap-3">
+          <img src={photo} alt="Pratinjau foto kenangan" className="h-20 w-20 rounded-xl object-cover" />
+          <button type="button" onClick={() => setPhoto("")} className="text-sm underline underline-offset-4">Hapus foto</button>
+        </div>
+      )}
       <button type="submit" className="btn-primary w-fit px-6 py-2 text-sm">Simpan kenangan</button>
     </form>
   );
