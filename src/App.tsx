@@ -97,6 +97,7 @@ export default function App() {
   const [admin, setAdmin] = useState(isAdmin());
   const [immersive, setImmersive] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
   const timer = useRef<number | null>(null);
 
@@ -310,8 +311,11 @@ export default function App() {
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
           <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
-          <div className="no-print flex justify-center">
+          <div className="no-print flex justify-center gap-2">
             <SharePanel entry={active} url={entryUrl(active.id)} icon />
+            <IconBtn label="Jadikan gambar" onClick={() => setQuoteFor(active)}>
+              {strokeIcon("M3 7h18v12H3zM9 11a1.6 1.6 0 1 0 0 0M3 17l5-4 4 3 4-4 5 5")}
+            </IconBtn>
           </div>
           <nav className="no-print mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
             {newerEntry ? (
@@ -326,6 +330,7 @@ export default function App() {
             ) : <span />}
           </nav>
         </article>
+        {quoteFor && <QuoteCardModal entry={quoteFor} onClose={() => setQuoteFor(null)} />}
       </div>
     );
   }
@@ -652,6 +657,9 @@ export default function App() {
             <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
             <div className="no-print mt-8 flex flex-wrap items-center gap-2">
               <SharePanel entry={active} url={entryUrl(active.id)} icon />
+              <IconBtn label="Jadikan gambar" onClick={() => setQuoteFor(active)}>
+                {strokeIcon("M3 7h18v12H3zM9 11a1.6 1.6 0 1 0 0 0M3 17l5-4 4 3 4-4 5 5")}
+              </IconBtn>
               <IconBtn label="Layar penuh" onClick={() => setImmersive(true)}>
                 {strokeIcon("M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7")}
               </IconBtn>
@@ -931,6 +939,7 @@ export default function App() {
           onClose={() => setSheetOpen(false)}
         />
       )}
+      {quoteFor && <QuoteCardModal entry={quoteFor} onClose={() => setQuoteFor(null)} />}
     </div>
   );
 }
@@ -1091,6 +1100,194 @@ function SharePanel({ entry, url, icon }: { entry: Entry; url: string; icon?: bo
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const t = window.setTimeout(() => rej(new Error("timeout")), 8000);
+    img.onload = () => {
+      window.clearTimeout(t);
+      res(img);
+    };
+    img.onerror = () => {
+      window.clearTimeout(t);
+      rej(new Error("gagal memuat"));
+    };
+    img.src = src;
+  });
+}
+
+function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let line = "";
+  for (const w of words) {
+    const t = line ? `${line} ${w}` : w;
+    if (ctx.measureText(t).width > maxWidth && line) {
+      lines.push(line);
+      line = w;
+      if (lines.length === maxLines) break;
+    } else {
+      line = t;
+    }
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  return lines;
+}
+
+async function renderQuoteCard(entry: Entry, coverUrl: string | null): Promise<Blob> {
+  const W = 1080;
+  const H = 1350;
+  const cv = document.createElement("canvas");
+  cv.width = W;
+  cv.height = H;
+  const ctx = cv.getContext("2d");
+  if (!ctx) throw new Error("canvas tak didukung");
+
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, "#16283a");
+  bg.addColorStop(1, "#0b1520");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  if (coverUrl) {
+    try {
+      const img = await loadImage(coverUrl);
+      const s = Math.max(W / img.width, H / img.height);
+      const dw = img.width * s;
+      const dh = img.height * s;
+      ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    } catch {
+      /* pakai latar gradasi */
+    }
+  }
+
+  const shade = ctx.createLinearGradient(0, H * 0.2, 0, H);
+  shade.addColorStop(0, "rgba(5,10,16,0)");
+  shade.addColorStop(1, "rgba(5,10,16,0.88)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, 0, W, H);
+
+  try {
+    await Promise.race([document.fonts.ready, new Promise((r) => window.setTimeout(r, 1500))]);
+  } catch {
+    /* lanjut dengan font cadangan */
+  }
+
+  const pad = 96;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = '600 64px "Playfair Display", Georgia, serif';
+  const titleLines = wrapLines(ctx, entry.title || "Tanpa judul", W - pad * 2, 3);
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.font = 'italic 500 46px "Cormorant Garamond", Georgia, serif';
+  const excerpt = entry.content.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 6).join(" / ");
+  const exLines = wrapLines(ctx, excerpt, W - pad * 2, 5);
+
+  let y = H - 150 - (titleLines.length * 80 + 24 + exLines.length * 62);
+  if (y < 200) y = 200;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = '600 64px "Playfair Display", Georgia, serif';
+  for (const ln of titleLines) {
+    y += 80;
+    ctx.fillText(ln, pad, y);
+  }
+  y += 24;
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.font = 'italic 500 46px "Cormorant Garamond", Georgia, serif';
+  for (const ln of exLines) {
+    y += 62;
+    ctx.fillText(ln, pad, y);
+  }
+
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.font = "600 30px Inter, sans-serif";
+  ctx.fillText("S E N A N D I K A", pad, H - 96);
+
+  return new Promise((res, rej) => {
+    cv.toBlob((b) => (b ? res(b) : rej(new Error("gagal merender"))), "image/png");
+  });
+}
+
+function QuoteCardModal({ entry, onClose }: { entry: Entry; onClose: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [blob, setBlob] = useState<Blob | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    let obj = "";
+    const cover = entry.cover ? new URL(`${import.meta.env.BASE_URL}${entry.cover}`, window.location.href).href : null;
+    renderQuoteCard(entry, cover)
+      .then((b) => {
+        if (!alive) return;
+        obj = URL.createObjectURL(b);
+        setBlob(b);
+        setUrl(obj);
+      })
+      .catch(() => {
+        if (alive) setFailed(true);
+      });
+    return () => {
+      alive = false;
+      if (obj) URL.revokeObjectURL(obj);
+    };
+  }, [entry]);
+
+  function downloadPng() {
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${entry.title || "senandika"}.png`;
+    a.click();
+  }
+
+  async function shareImage() {
+    if (!blob) return;
+    const nav = navigator as Navigator & {
+      canShare?: (d: { files?: File[] }) => boolean;
+      share?: (d: { files?: File[]; title?: string }) => Promise<void>;
+    };
+    const file = new File([blob], `${entry.title || "senandika"}.png`, { type: "image/png" });
+    if (nav.canShare?.({ files: [file] }) && nav.share) {
+      try {
+        await nav.share({ files: [file], title: entry.title || "Senandika" });
+        return;
+      } catch {
+        /* lanjut unduh */
+      }
+    }
+    downloadPng();
+  }
+
+  return (
+    <div className="no-print">
+      <button className="sheet-overlay" onClick={onClose} aria-label="Tutup kartu gambar" />
+      <div className="sheet p-5 pb-8" role="dialog" aria-modal="true" aria-label="Kartu gambar kutipan">
+        <div className="mx-auto mb-4 h-1 w-12 rounded-full" style={{ background: "var(--line)" }} />
+        <h3 className="font-display text-xl">Kartu gambar</h3>
+        <div className="mt-4 flex justify-center">
+          {url ? (
+            <img src={url} alt={`Kartu gambar: ${entry.title || "tanpa judul"}`} className="max-h-[46vh] rounded-xl border" style={{ borderColor: "var(--line)" }} />
+          ) : (
+            <p className="py-10 text-sm opacity-60">{failed ? "Gambar gagal dibuat. Coba lagi." : "Merangkai gambar…"}</p>
+          )}
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <button onClick={shareImage} disabled={!blob} className="btn-primary px-5 py-2 text-sm">
+            Bagikan gambar
+          </button>
+          <button onClick={downloadPng} disabled={!blob} className="btn-ghost px-5 py-2 text-sm">
+            Unduh PNG
+          </button>
+          <button onClick={onClose} className="btn-ghost px-5 py-2 text-sm">
+            Tutup
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

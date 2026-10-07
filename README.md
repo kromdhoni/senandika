@@ -2,7 +2,7 @@
 
 Live: https://kromdhoni.github.io/senandika/
 
-Situs publik read-only + mode admin (PIN) untuk menulis. Backend Cloudflare Workers + D1 + R2 menyusul di fase berikutnya.
+Situs publik read-only + mode admin (PIN) untuk menulis. Share tautan per tulisan, mode baca imersif, kartu gambar kutipan (PNG), Kapsul Waktu, PWA installable + offline. Backend Cloudflare Workers + D1 + R2 menyusul di fase berikutnya.
 
 ## Jalankan
 
