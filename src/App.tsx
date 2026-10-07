@@ -11,6 +11,7 @@ import {
 } from "./types";
 import { GAYA_PUISI } from "./data/gaya";
 import Reveal from "./components/Reveal";
+import Typewriter from "./components/Typewriter";
 import Waves from "./components/Waves";
 import {
   adminLogin,
@@ -34,6 +35,12 @@ const TYPE_COVER: Record<EntryType, string> = {
   POEM: "linear-gradient(120deg, #2e86c1, #7fb3d5)",
   NOTE: "linear-gradient(120deg, #a9cce3, #5499c7)",
 };
+
+const HERO_LINES = [
+  "Ada kata yang belum sempat terucap.",
+  "Beberapa cukup dituliskan agar tidak hilang.",
+  "Simpan yang tak ingin dilupakan.",
+];
 
 function todayLocal() {
   const d = new Date();
@@ -100,6 +107,36 @@ export default function App() {
   const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
+  const [heroIdx, setHeroIdx] = useState(0);
+  const [spot] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: fine)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  const greeting = useMemo(() => {
+    const n = new Date();
+    const h = n.getHours();
+    const part = h >= 4 && h < 11 ? "pagi" : h >= 11 && h < 15 ? "siang" : h >= 15 && h < 18 ? "sore" : "malam";
+    return `Selamat ${part} · ${n.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
+  }, []);
+
+  const heroPool = useMemo(() => entries.filter((e) => e.cover).slice(0, 12), [entries]);
+  const heroEntry = heroPool.length > 0 ? heroPool[heroIdx % heroPool.length] : null;
+
+  useEffect(() => {
+    if (view !== "landing" || heroPool.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setInterval(() => setHeroIdx((i) => (i + 1) % heroPool.length), 5500);
+    return () => window.clearInterval(t);
+  }, [view, heroPool]);
+
+  function onHeroMove(e: { currentTarget: HTMLElement; clientX: number; clientY: number }) {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+  }
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -440,11 +477,13 @@ export default function App() {
 
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 md:pb-16">
         {view === "landing" && (
-          <section className="fade-in mx-auto max-w-5xl py-10 md:py-16">
+          <section onMouseMove={onHeroMove} className="fade-in relative mx-auto max-w-5xl py-10 md:py-16">
+            {spot && <div className="spotlight" aria-hidden="true" />}
             <div className="grid items-center gap-10 md:grid-cols-2">
               <div className="text-center md:text-left">
-                <h1 className="font-display mt-4 text-4xl font-medium md:text-6xl">
-                  Ada kata yang belum sempat <span className="accent-word">terucap.</span>
+                <p className="eyebrow">{greeting}</p>
+                <h1 className="font-display mt-4 min-h-[2.6em] text-4xl font-medium md:text-6xl">
+                  <Typewriter lines={HERO_LINES} />
                 </h1>
                 <p className="mx-auto mt-5 max-w-xl text-lg opacity-80 md:mx-0">
                   Senandika adalah rumah bagi surat, kenangan, dan doa. Ditulis dengan tenang, disimpan dengan kasih.
@@ -464,13 +503,53 @@ export default function App() {
                   <ellipse cx="66" cy="42" rx="12" ry="5" transform="rotate(30 66 42)" fill="var(--leaf)" opacity="0.35" stroke="none" />
                   <circle cx="50" cy="12" r="4" fill="var(--accent)" stroke="none" />
                 </svg>
-                <div className="polaroid float-soft relative p-6 pt-9">
-                  <span className="tape" aria-hidden="true" />
-                  <p className="font-quote text-xl italic">
-                    “Beberapa hal tidak harus dikatakan, cukup dituliskan.”
-                  </p>
-                  <p className="mt-3 text-xs uppercase tracking-[0.2em] opacity-50">Senandika · catatan hari ini</p>
-                </div>
+                {heroEntry ? (
+                  <>
+                    <button
+                      onClick={() => openEntry(heroEntry.id)}
+                      className="polaroid float-soft relative block w-full p-4 pt-9 text-left"
+                      aria-label={`Baca: ${heroEntry.title || "tanpa judul"}`}
+                    >
+                      <span className="tape" aria-hidden="true" />
+                      <img
+                        src={`${import.meta.env.BASE_URL}${heroEntry.cover}`}
+                        alt=""
+                        className="h-44 w-full rounded object-cover"
+                      />
+                      <p key={heroEntry.id} className="font-quote fade-in mt-3 text-xl italic">
+                        “{heroEntry.content.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 2).join(" / ")}”
+                      </p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.2em] opacity-50">
+                        {heroEntry.title || "Tanpa judul"}
+                      </p>
+                    </button>
+                    <div className="mt-3 flex justify-center gap-1.5">
+                      {heroPool.map((e, i) => (
+                        <button
+                          key={e.id}
+                          onClick={() => setHeroIdx(i)}
+                          aria-label={`Foto ${i + 1}: ${e.title || "tanpa judul"}`}
+                          className="h-1.5 rounded-full"
+                          style={{
+                            width: i === heroIdx % heroPool.length ? "20px" : "6px",
+                            background:
+                              i === heroIdx % heroPool.length
+                                ? "var(--accent)"
+                                : "color-mix(in srgb, var(--muted) 40%, transparent)",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="polaroid float-soft relative p-6 pt-9">
+                    <span className="tape" aria-hidden="true" />
+                    <p className="font-quote text-xl italic">
+                      “Beberapa hal tidak harus dikatakan, cukup dituliskan.”
+                    </p>
+                    <p className="mt-3 text-xs uppercase tracking-[0.2em] opacity-50">Senandika · catatan hari ini</p>
+                  </div>
+                )}
               </div>
             </div>
 
