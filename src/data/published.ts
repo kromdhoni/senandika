@@ -704,6 +704,7 @@ export const PUBLISHED_MEMORIES: Memory[] = [
     story: "Hari ketika aku menjadi seorang Ayah.",
     memoryDate: "2022-08-27",
     location: "Rumah",
+    photo: "covers/rumah.jpg",
     createdAt: "2022-08-27T10:00:00.000Z",
   },
 ];

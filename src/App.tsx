@@ -181,6 +181,16 @@ export default function App() {
       .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
   }, [entries, query]);
 
+  const memorySpan = useMemo(() => {
+    const years = memories
+      .map((m) => new Date(`${m.memoryDate}T00:00:00`).getFullYear())
+      .filter((y) => !Number.isNaN(y));
+    if (years.length === 0) return "";
+    const a = Math.min(...years);
+    const b = Math.max(...years);
+    return a === b ? ` · sejak ${a}` : ` · ${a}–${b}`;
+  }, [memories]);
+
   const kapsulInfo = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -247,7 +257,7 @@ export default function App() {
   }
 
   function entryUrl(id: string) {
-    return `${window.location.origin}${window.location.pathname}#/baca/${id}`;
+    return `${window.location.origin}${import.meta.env.BASE_URL}baca/${id}/`;
   }
 
   function openEntry(id: string, full = false) {
@@ -904,12 +914,20 @@ export default function App() {
             <p className="eyebrow">Arsip momen</p>
             <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Kenangan</h2>
             <p className="mt-2 text-sm opacity-70">Cerita dan momen yang tidak ingin dilupakan.</p>
+            <p className="font-quote mt-3 text-xl italic opacity-80">
+              “Yang terlupakan, seolah tak pernah terjadi.”
+            </p>
+            {memories.length > 0 && (
+              <p className="mt-2 text-xs uppercase tracking-[0.2em] opacity-50">
+                {memories.length} cerita{memorySpan}
+              </p>
+            )}
             {admin && <MemoryForm onAdd={(m) => setMemories((p) => [m, ...p])} />}
             <div className="stagger mt-6 grid gap-4 sm:grid-cols-2">
               {memories.map((m, i) => (
                 <div key={m.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
                   {m.photo ? (
-                    <img src={m.photo} alt="" loading="lazy" className="h-44 w-full object-cover" />
+                    <img src={m.photo.startsWith("data:") ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`} alt="" loading="lazy" className="h-44 w-full object-cover" />
                   ) : (
                     <div className="h-1.5" style={{ background: "linear-gradient(to right, var(--accent), transparent)" }} />
                   )}
