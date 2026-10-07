@@ -98,6 +98,7 @@ export default function App() {
   const [immersive, setImmersive] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
   const timer = useRef<number | null>(null);
 
@@ -245,6 +246,39 @@ export default function App() {
     }
   }, [view]);
 
+  function speak(e: Entry) {
+    try {
+      const synth = window.speechSynthesis;
+      if (!synth) return;
+      if (speakingId === e.id) {
+        synth.cancel();
+        setSpeakingId(null);
+        return;
+      }
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(`${e.title}. ${e.content}`);
+      u.lang = "id-ID";
+      u.rate = 0.95;
+      const voice = synth.getVoices().find((x) => x.lang?.toLowerCase().startsWith("id"));
+      if (voice) u.voice = voice;
+      u.onend = () => setSpeakingId(null);
+      u.onerror = () => setSpeakingId(null);
+      synth.speak(u);
+      setSpeakingId(e.id);
+    } catch {
+      /* abaikan */
+    }
+  }
+
+  useEffect(() => {
+    try {
+      window.speechSynthesis?.cancel();
+    } catch {
+      /* abaikan */
+    }
+    setSpeakingId(null);
+  }, [view, activeId]);
+
   const nav: { id: View; label: string }[] = [
     { id: "senandika", label: "Koleksi" },
     { id: "kenangan", label: "Kenangan" },
@@ -261,6 +295,20 @@ export default function App() {
   const olderEntry = activeIndex >= 0 && activeIndex < sortedAll.length - 1 ? sortedAll[activeIndex + 1] : null;
 
   const favList = filtered.filter((e) => e.isFavorite);
+
+  const padaHariIni = useMemo(() => {
+    const now = new Date();
+    return entries
+      .filter((en) => {
+        const d = new Date(en.createdAt);
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getDate() === now.getDate() &&
+          d.getFullYear() < now.getFullYear()
+        );
+      })
+      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  }, [entries]);
 
   function changeFontScale(d: number) {
     setFontScale((prev) => {
@@ -315,6 +363,15 @@ export default function App() {
             <SharePanel entry={active} url={entryUrl(active.id)} icon />
             <IconBtn label="Jadikan gambar" onClick={() => setQuoteFor(active)}>
               {strokeIcon("M3 7h18v12H3zM9 11a1.6 1.6 0 1 0 0 0M3 17l5-4 4 3 4-4 5 5")}
+            </IconBtn>
+            <IconBtn label={speakingId === active.id ? "Hentikan" : "Dengarkan"} onClick={() => speak(active)}>
+              {speakingId === active.id ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />
+                </svg>
+              ) : (
+                strokeIcon("M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14")
+              )}
             </IconBtn>
           </div>
           <nav className="no-print mt-10 flex items-center justify-between gap-3 text-sm" aria-label="Tulisan lain">
@@ -441,6 +498,42 @@ export default function App() {
                   {entries[0].content.slice(0, 140)}{entries[0].content.length > 140 ? "…" : ""}
                 </span>
               </button>
+            )}
+
+            {padaHariIni.length > 0 && (
+              <Reveal className="mx-auto mt-12 max-w-3xl">
+                <p className="eyebrow text-center">Pada hari ini</p>
+                <h2 className="font-display mt-1 text-center text-2xl font-medium md:text-3xl">
+                  Tahun-tahun lalu
+                </h2>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {padaHariIni.map((e) => {
+                    const years = new Date().getFullYear() - new Date(e.createdAt).getFullYear();
+                    return (
+                      <button key={e.id} onClick={() => openEntry(e.id)} className="card card-lift flex items-center gap-3 p-3 text-left">
+                        {e.cover ? (
+                          <img
+                            src={`${import.meta.env.BASE_URL}${e.cover}`}
+                            alt=""
+                            loading="lazy"
+                            className="h-14 w-14 flex-none rounded-xl object-cover"
+                          />
+                        ) : (
+                          <span className="mono-thumb" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true">
+                            {(e.title || "S").charAt(0)}
+                          </span>
+                        )}
+                        <span>
+                          <span className="font-display block leading-snug">{e.title || "Tanpa judul"}</span>
+                          <span className="text-xs opacity-60">
+                            {years} tahun lalu · {new Date(e.createdAt).getFullYear()}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Reveal>
             )}
 
             <Reveal>
@@ -659,6 +752,15 @@ export default function App() {
               <SharePanel entry={active} url={entryUrl(active.id)} icon />
               <IconBtn label="Jadikan gambar" onClick={() => setQuoteFor(active)}>
                 {strokeIcon("M3 7h18v12H3zM9 11a1.6 1.6 0 1 0 0 0M3 17l5-4 4 3 4-4 5 5")}
+              </IconBtn>
+              <IconBtn label={speakingId === active.id ? "Hentikan" : "Dengarkan"} onClick={() => speak(active)}>
+                {speakingId === active.id ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />
+                  </svg>
+                ) : (
+                  strokeIcon("M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14")
+                )}
               </IconBtn>
               <IconBtn label="Layar penuh" onClick={() => setImmersive(true)}>
                 {strokeIcon("M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7")}
@@ -1377,6 +1479,7 @@ function MemoryForm({ onAdd }: { onAdd: (m: Memory) => void }) {
 }
 
 function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: string) => void }) {
+  const [tab, setTab] = useState<"daftar" | "kalender">("daftar");
   const groups = useMemo(() => {
     const map = new Map<string, Entry[]>();
     for (const e of [...entries].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))) {
@@ -1389,7 +1492,19 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
   }, [entries]);
   if (groups.length === 0) return <p className="mt-4 opacity-70">Belum ada cerita di sini.</p>;
   return (
-    <div className="mt-6 space-y-8">
+    <div className="mt-6">
+      <div className="flex gap-2" role="tablist" aria-label="Tampilan timeline">
+        <button role="tab" aria-selected={tab === "daftar"} onClick={() => setTab("daftar")}
+          className={`rounded-full border px-4 py-1 text-sm ${tab === "daftar" ? "font-semibold underline underline-offset-4" : "opacity-70"}`}>
+          Daftar
+        </button>
+        <button role="tab" aria-selected={tab === "kalender"} onClick={() => setTab("kalender")}
+          className={`rounded-full border px-4 py-1 text-sm ${tab === "kalender" ? "font-semibold underline underline-offset-4" : "opacity-70"}`}>
+          Kalender
+        </button>
+      </div>
+      {tab === "daftar" ? (
+      <div className="mt-6 space-y-8">
       {groups.map(([label, list]) => (
         <div key={label}>
           <h3 className="eyebrow">{label}</h3>
@@ -1408,6 +1523,107 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
           </div>
         </div>
       ))}
+      </div>
+      ) : (
+        <CalendarView entries={entries} onOpen={onOpen} />
+      )}
+    </div>
+  );
+}
+
+function CalendarView({ entries, onOpen }: { entries: Entry[]; onOpen: (id: string) => void }) {
+  const now = new Date();
+  const [cursor, setCursor] = useState({ y: now.getFullYear(), m: now.getMonth() });
+  const [sel, setSel] = useState<string | null>(null);
+  const byDay = useMemo(() => {
+    const map = new Map<string, Entry[]>();
+    for (const e of entries) {
+      const d = new Date(e.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)?.push(e);
+    }
+    return map;
+  }, [entries]);
+  const first = new Date(cursor.y, cursor.m, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(cursor.y, cursor.m + 1, 0).getDate();
+  const cells: (string | null)[] = [
+    ...Array<string | null>(offset).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => `${cursor.y}-${String(cursor.m + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}` as string | null),
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+  const title = first.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  const isCurrent = cursor.y === now.getFullYear() && cursor.m === now.getMonth();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const selEntries = sel ? (byDay.get(sel) ?? []) : [];
+  return (
+    <div className="card mt-6 p-5">
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setCursor((c) => (c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 }))}
+          className="icon-btn" aria-label="Bulan sebelumnya" title="Bulan sebelumnya">
+          ‹
+        </button>
+        <h3 className="font-display text-xl capitalize">{title}</h3>
+        <button
+          onClick={() => setCursor((c) => (c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 }))}
+          className="icon-btn" aria-label="Bulan berikutnya" title="Bulan berikutnya">
+          ›
+        </button>
+      </div>
+      {!isCurrent && (
+        <button onClick={() => setCursor({ y: now.getFullYear(), m: now.getMonth() })} className="mt-1 text-xs underline underline-offset-4 opacity-70">
+          Kembali ke bulan ini
+        </button>
+      )}
+      <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs opacity-60">
+        {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((d) => (
+          <span key={d}>{d}</span>
+        ))}
+      </div>
+      <div className="mt-1 grid grid-cols-7 gap-1">
+        {cells.map((key, i) =>
+          key ? (
+            <button
+              key={key}
+              onClick={() => setSel(key)}
+              aria-label={`${Number(key.slice(8))} ${(byDay.get(key)?.length ?? 0)} tulisan`}
+              className="flex aspect-square flex-col items-center justify-center rounded-xl text-sm"
+              style={
+                sel === key
+                  ? { background: "color-mix(in srgb, var(--accent) 22%, transparent)", fontWeight: 700 }
+                  : key === todayStr
+                    ? { border: "1px solid var(--accent)" }
+                    : undefined
+              }
+            >
+              <span>{Number(key.slice(8))}</span>
+              {(byDay.get(key)?.length ?? 0) > 0 && (
+                <span className="mt-0.5 block h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+              )}
+            </button>
+          ) : (
+            <span key={`x${i}`} />
+          ),
+        )}
+      </div>
+      {sel && (
+        <div className="mt-4 border-t pt-3" style={{ borderColor: "color-mix(in srgb, var(--muted) 25%, transparent)" }}>
+          <p className="text-xs uppercase tracking-widest opacity-60">{formatDateLong(`${sel}T00:00:00`)}</p>
+          {selEntries.length === 0 ? (
+            <p className="mt-1 text-sm opacity-70">Tidak ada tulisan hari itu.</p>
+          ) : (
+            <div className="mt-2 space-y-2">
+              {selEntries.map((e) => (
+                <button key={e.id} onClick={() => onOpen(e.id)} className="card card-lift block w-full p-3 text-left">
+                  <span className="font-display">{e.title || "Tanpa judul"}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
