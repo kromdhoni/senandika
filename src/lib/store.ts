@@ -1,4 +1,4 @@
-import { PUBLISHED_ENTRIES, PUBLISHED_MEMORIES } from "../data/published";
+import { PUBLISHED_CAPSULES, PUBLISHED_ENTRIES, PUBLISHED_MEMORIES } from "../data/published";
 import type { Capsule, Entry, Memory } from "../types";
 
 /**
@@ -24,8 +24,19 @@ function freshCopy(): Persisted {
   return {
     entries: JSON.parse(JSON.stringify(PUBLISHED_ENTRIES)) as Entry[],
     memories: JSON.parse(JSON.stringify(PUBLISHED_MEMORIES)) as Memory[],
-    capsules: [],
+    capsules: JSON.parse(JSON.stringify(PUBLISHED_CAPSULES)) as Capsule[],
   };
+}
+
+function mergeById<T extends { id: string }>(local: T[] | undefined, published: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const item of [...(local ?? []), ...published]) {
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    out.push(item);
+  }
+  return out;
 }
 
 export function load(): Persisted {
@@ -38,11 +49,23 @@ export function load(): Persisted {
     }
     const data = JSON.parse(raw) as Partial<Persisted>;
     const fresh = freshCopy();
-    return {
-      entries: Array.isArray(data.entries) ? data.entries : fresh.entries,
-      memories: Array.isArray(data.memories) ? data.memories : fresh.memories,
-      capsules: Array.isArray(data.capsules) ? data.capsules : [],
+    const merged = {
+      entries: mergeById(
+        Array.isArray(data.entries) ? data.entries : undefined,
+        fresh.entries,
+      ),
+      memories: mergeById(
+        Array.isArray(data.memories) ? data.memories : undefined,
+        fresh.memories,
+      ),
+      capsules: mergeById(
+        Array.isArray(data.capsules) ? data.capsules : undefined,
+        fresh.capsules,
+      ),
     };
+    // versi lokal menang; yang hilang dari publikasi ditambahkan tanpa reset
+    localStorage.setItem(KEY, JSON.stringify(merged));
+    return merged;
   } catch {
     return freshCopy();
   }
@@ -109,8 +132,8 @@ export function toMarkdownEntry(e: Entry) {
 }
 
 /** Hasilkan isi src/data/published.ts agar tulisan admin tampil publik. */
-export function toPublishedTs(entries: Entry[], memories: Memory[]) {
-  const header = `import type { Entry, Memory } from "../types";\n\n/**\n * Konten publik: inilah yang dibaca semua pengunjung situs.\n * Admin menulis lewat mode admin di browser, lalu mengekspor\n * "file publikasi" dan mengganti file ini agar tulisan tampil\n * untuk semua orang setelah deploy ulang.\n *\n * Catatan: foto kenangan lokal tidak ikut (tetap di peramban).\n */\n`;
+export function toPublishedTs(entries: Entry[], memories: Memory[], capsules: Capsule[]) {
+  const header = `import type { Capsule, Entry, Memory } from "../types";\n\n/**\n * Konten publik: inilah yang dibaca semua pengunjung situs.\n * Admin menulis lewat mode admin di browser, lalu mengekspor\n * "file publikasi" dan mengganti file ini agar tulisan tampil\n * untuk semua orang setelah deploy ulang.\n *\n * Catatan: foto kenangan lokal tidak ikut (tetap di peramban).\n */\n`;
   const cleanMemories = memories.map((m) => {
     if (m.photo && m.photo.startsWith("data:")) {
       const { photo: _dropped, ...rest } = m;
@@ -121,7 +144,8 @@ export function toPublishedTs(entries: Entry[], memories: Memory[]) {
   return (
     header +
     `export const PUBLISHED_ENTRIES: Entry[] = ${JSON.stringify(entries, null, 2)};\n\n` +
-    `export const PUBLISHED_MEMORIES: Memory[] = ${JSON.stringify(cleanMemories, null, 2)};\n`
+    `export const PUBLISHED_MEMORIES: Memory[] = ${JSON.stringify(cleanMemories, null, 2)};\n\n` +
+    `export const PUBLISHED_CAPSULES: Capsule[] = ${JSON.stringify(capsules, null, 2)};\n`
   );
 }
 

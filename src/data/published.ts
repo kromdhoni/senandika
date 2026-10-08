@@ -1,4 +1,4 @@
-import type { Entry, Memory } from "../types";
+import type { Capsule, Entry, Memory } from "../types";
 
 /**
  * Konten publik: inilah yang dibaca semua pengunjung situs.
@@ -706,5 +706,90 @@ export const PUBLISHED_MEMORIES: Memory[] = [
     location: "Rumah",
     photo: "covers/rumah.jpg",
     createdAt: "2022-08-27T10:00:00.000Z",
+  },
+  {
+    id: "mem-2",
+    title: "Mudik terakhir yang utuh",
+    story:
+      "jalanan macet tujuh jam\ntapi tawa di jok belakang\ntidak ikut macet\n\nIbu membungkus ketupat\nseakan waktu\nbisa dibungkus juga",
+    memoryDate: "2024-04-09",
+    location: "Kampung halaman",
+    photo: "covers/keluarga.jpg",
+    createdAt: "2024-04-09T10:00:00.000Z",
+  },
+  {
+    id: "mem-3",
+    title: "Ulang tahun Ayah yang sederhana",
+    story:
+      "kue kecil, lilin ditiup dua kali\nkarena sekali tidak cukup\nuntuk semua doa yang tertunda\n\nAyah tertawa\nseperti orang yang tidak pernah lelah\npadahal kami tahu",
+    memoryDate: "2023-06-17",
+    location: "Rumah",
+    photo: "covers/ayah.jpg",
+    createdAt: "2023-06-17T10:00:00.000Z",
+  },
+  {
+    id: "mem-4",
+    title: "Hujan pertama di rumah baru",
+    story:
+      "genteng bocor di satu titik\nkami menampungnya dengan ember\nsambil tertawa\n\nternyata bahagia\nbisa sesederhana itu:\natap, hujan, dan kita",
+    memoryDate: "2021-11-02",
+    location: "Rumah baru",
+    photo: "covers/rindu.jpg",
+    createdAt: "2021-11-02T10:00:00.000Z",
+  },
+  {
+    id: "mem-5",
+    title: "Genggaman Ibu di pintu",
+    story:
+      "setiap akan pergi jauh\nIbu menggenggam tanganku\nsedikit lebih lama\n\nseakan doa\nbutuh pintu keluar\nlewat telapak tangan",
+    memoryDate: "2020-01-05",
+    location: "Pintu rumah",
+    photo: "covers/tenang.jpg",
+    createdAt: "2020-01-05T10:00:00.000Z",
+  },
+  {
+    id: "mem-6",
+    title: "Telepon pertama setelah lulus",
+    story:
+      "sidang selesai, toga masih bau baru\ntelepon pertama bukan ke siapa-siapa\ntapi ke Ibu\n\nBu, anakmu lulus\ntiga kata\nmenangis di dua kota",
+    memoryDate: "2019-08-22",
+    location: "Kampus",
+    photo: "covers/harap-3.jpg",
+    createdAt: "2019-08-22T10:00:00.000Z",
+  },
+];
+
+export const PUBLISHED_CAPSULES: Capsule[] = [
+  {
+    id: "cap-1",
+    title: "Untuk diriku lima tahun lagi",
+    message:
+      "hai, aku dari 2026\n\napakah kamu masih menulis?\napakah luka-luka itu akhirnya sembuh?\n\nkalau ya, terima kasih sudah bertahan\nkalau belum, tidak apa\naku tetap menunggumu\ndi sini",
+    openDate: "2031-10-08",
+    createdAt: "2026-10-08T10:00:00.000Z",
+  },
+  {
+    id: "cap-2",
+    title: "Untuk anakku kelak",
+    message:
+      "nak, ayah menulis ini\nbahkan sebelum kamu ada\n\nkelak kalau kamu lelah\nbacalah ini pelan-pelan:\nayah pernah di titikmu\ndan ayah memilih bertahan",
+    openDate: "2035-06-01",
+    createdAt: "2026-10-08T10:00:00.000Z",
+  },
+  {
+    id: "cap-3",
+    title: "Untuk Ibu, Desember nanti",
+    message:
+      "Bu, kalau surat ini terbuka\nberarti aku berhasil bertahan\nsetahun lagi\n\nterima kasih\nsudah menjadi rumah\nbagi anakmu yang sering pergi",
+    openDate: "2026-12-22",
+    createdAt: "2026-10-08T10:00:00.000Z",
+  },
+  {
+    id: "cap-4",
+    title: "Untukku saat ingin menyerah",
+    message:
+      "kalau kamu membuka ini\nberarti harimu berat\n\ntidak apa.\nduduk dulu.\nminum air.\n\ningat: kamu pernah berjanji\npada dirimu setahun yang lalu\nuntuk tetap hidup\ndan janji itu masih berlaku",
+    openDate: "2027-10-08",
+    createdAt: "2026-10-08T10:00:00.000Z",
   },
 ];

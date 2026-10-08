@@ -948,7 +948,7 @@ export default function App() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button onClick={() => openNew()} className="btn-primary px-5 py-2 text-sm">+ Tulis Senandika</button>
                   <button
-                    onClick={() => download("published.ts", toPublishedTs(entries, memories), "text/plain")}
+                    onClick={() => download("published.ts", toPublishedTs(entries, memories, capsules), "text/plain")}
                     className="btn-ghost px-5 py-2 text-sm"
                   >
                     Export file publikasi
