@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
+  BookOpen,
+  Feather,
+  Flame,
+  HeartHandshake,
+  Lock,
+  MailOpen,
+  Search,
+  StickyNote,
+} from "lucide-react";
+import {
   ENTRY_TYPES,
   RECIPIENTS,
   type Capsule,
@@ -18,7 +28,6 @@ import FinsycQuotes from "./components/landing/FinsycQuotes";
 import PageBackdrop from "./components/PageBackdrop";
 import PageHero from "./components/PageHero";
 import SiteHeader from "./components/landing/SiteHeader";
-import Waves from "./components/Waves";
 import {
   adminLogin,
   adminLogout,
@@ -32,6 +41,15 @@ import {
   toPublishedTs,
   uid,
 } from "./lib/store";
+
+const TYPE_ICON = {
+  LETTER: MailOpen,
+  JOURNAL: BookOpen,
+  MEMORY: HeartHandshake,
+  PRAYER: Flame,
+  POEM: Feather,
+  NOTE: StickyNote,
+} as const;
 
 const TYPE_COVER: Record<EntryType, string> = {
   LETTER: "linear-gradient(120deg, #2e86c1, #1a5276)",
@@ -358,8 +376,7 @@ export default function App() {
 
   if (view === "baca" && active && immersive) {
     return (
-      <div className="min-h-screen">
-        <Waves />
+      <div className="min-h-screen" style={{ background: "var(--bg)" }}>
         <ReadingProgress />
         <div className="no-print mx-auto flex max-w-2xl items-center justify-between gap-2 px-5 py-4">
           <IconBtn label="Kembali" onClick={() => setImmersive(false)}>
@@ -422,7 +439,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <Waves />
+      {["senandika", "favorit", "kenangan", "timeline", "kapsul"].includes(view) && <PageBackdrop />}
       <SiteHeader
         view={view}
         go={setView}
@@ -528,7 +545,6 @@ export default function App() {
         {(view === "senandika" || view === "favorit") && (
           <>
           <section className="fade-in mx-auto max-w-5xl">
-            <PageBackdrop />
             <PageHero
               tone="dark"
               pill={view === "favorit" ? "Penanda pribadi" : "Senandika"}
@@ -551,9 +567,10 @@ export default function App() {
               </div>
             )}
             <div className="band mt-6 p-4 sm:p-6">
-            <div className="flex gap-2">
+            <div className="searchbar">
+              <Search className="h-5 w-5 flex-none opacity-50" aria-hidden="true" />
               <input
-                className="input"
+                className="searchinput"
                 placeholder='Cari "ibu"'
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -567,6 +584,7 @@ export default function App() {
               {(view === "favorit" ? favList : filtered).map((e, i) => {
                 const featured = i === 0;
                 const limit = featured ? 200 : 120;
+                const Icon = TYPE_ICON[e.type];
                 return (
                 <article key={e.id} className={`card card-lift overflow-hidden${featured ? " sm:col-span-2" : ""}`} style={{ ["--i" as string]: Math.min(i, 6) }}>
                   {e.cover ? (
@@ -580,6 +598,9 @@ export default function App() {
                     <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
                   )}
                   <div className={featured ? "p-6 md:p-8" : "p-5"}>
+                  <span className="sheet-icon mb-4" aria-hidden="true">
+                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  </span>
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className={featured ? "font-onest mt-1 block text-2xl font-semibold tracking-[-0.8px] md:text-3xl" : "font-onest mt-1 block text-xl font-semibold tracking-[-0.8px]"}>{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, limit)}{e.content.length > limit ? "…" : ""}</span>
@@ -750,7 +771,6 @@ export default function App() {
         {view === "kenangan" && (
           <>
           <section className="fade-in mx-auto max-w-5xl">
-            <PageBackdrop />
             <PageHero
               tone="dark"
               pill="Arsip momen"
@@ -802,7 +822,6 @@ export default function App() {
         {view === "timeline" && (
           <>
           <section className="fade-in mx-auto max-w-5xl">
-            <PageBackdrop />
             <PageHero
               tone="dark"
               pill="Jejak waktu"
@@ -822,7 +841,6 @@ export default function App() {
         {view === "kapsul" && (
           <>
           <section className="fade-in mx-auto max-w-5xl">
-            <PageBackdrop />
             <PageHero
               tone="dark"
               pill="Kapsul waktu"
@@ -841,6 +859,9 @@ export default function App() {
                   isCapsuleOpen(k) ? (
                     <article key={k.id} className="card card-lift p-5">
                       <p className="eyebrow">Dibuka {formatDateLong(`${k.openDate}T00:00:00`)}</p>
+                      <span className="sheet-icon mb-3 mt-3" aria-hidden="true">
+                        <MailOpen className="h-5 w-5" strokeWidth={2} />
+                      </span>
                       <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{k.title}</h3>
                       <p className="prose-read mt-2 whitespace-pre-wrap text-[1rem]" dir="auto">{k.message}</p>
                       {admin && (
@@ -852,10 +873,7 @@ export default function App() {
                   ) : (
                     <div key={k.id} className="card p-5 opacity-90">
                       <p className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                          <rect x="5" y="11" width="14" height="9" rx="2" />
-                          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-                        </svg>
+                        <Lock className="h-3.5 w-3.5" aria-hidden="true" />
                         Terkunci · dibuka {formatDateLong(`${k.openDate}T00:00:00`)}
                       </p>
                       <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{k.title}</h3>

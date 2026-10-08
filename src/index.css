@@ -37,9 +37,9 @@
   --line: var(--color-linen);
   --text: var(--color-ink);
   --muted: var(--color-muted);
-  --radius: 20px;
+  --radius: 24px;
   --shadow-soft: none;
-  --shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.22);
+  --shadow-lift: 0 20px 55px -20px rgb(0 0 0 / 0.14);
   color-scheme: light;
 }
 
@@ -225,6 +225,40 @@ body::before {
 .btn-mini:hover {
   border-color: var(--accent);
   transform: translateY(-1px);
+}
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--muted) 18%, transparent);
+  border-radius: 20px;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  box-shadow: 0 1px 20px rgb(30 100 160 / 0.08);
+}
+
+.dark .searchbar {
+  background: #000000;
+}
+
+.searchbar:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.searchinput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.searchinput::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
 }
 
 .tabbar {
