@@ -15,6 +15,8 @@ import FinsycFooter from "./components/landing/FinsycFooter";
 import FinsycHeader from "./components/landing/FinsycHeader";
 import FinsycHowItWorks from "./components/landing/FinsycHowItWorks";
 import FinsycQuotes from "./components/landing/FinsycQuotes";
+import PageHero from "./components/PageHero";
+import SiteHeader from "./components/landing/SiteHeader";
 import Waves from "./components/Waves";
 import {
   adminLogin,
@@ -309,12 +311,6 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }, [view]);
 
-  const nav: { id: View; label: string }[] = [
-    { id: "senandika", label: "Koleksi" },
-    { id: "kenangan", label: "Kenangan" },
-    { id: "timeline", label: "Timeline" },
-    { id: "kapsul", label: "Kapsul" },
-  ];
 
   const sortedAll = useMemo(
     () => [...entries].sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt)),
@@ -426,48 +422,14 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <Waves />
-      <header className="sticky top-0 z-10 border-b backdrop-blur" style={{ background: "color-mix(in srgb, var(--bg) 86%, transparent)", borderColor: "color-mix(in srgb, var(--muted) 25%, transparent)" }}>
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <button onClick={() => setView("landing")} className="font-display text-lg font-semibold uppercase tracking-[0.24em]" aria-label="Senandika beranda">
-            Senandika
-          </button>
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
-            {nav.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => setView(n.id)}
-                className={`font-display rounded-full px-4 py-2 text-[13px] uppercase tracking-[0.2em] ${view === n.id ? "font-semibold underline underline-offset-8" : "opacity-70 hover:opacity-100"}`}
-              >
-                {n.label}
-              </button>
-            ))}
-            <span className="ml-2">
-              <IconBtn
-                label={theme === "dark" ? "Mode terang" : "Mode gelap"}
-                onClick={() => setThemeState(theme === "dark" ? "light" : "dark")}
-              >
-                {theme === "dark"
-                  ? strokeIcon("M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4")
-                  : strokeIcon("M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z")}
-              </IconBtn>
-            </span>
-            {admin && (
-              <button onClick={() => openNew()} className="btn-primary ml-2 px-5 py-2 text-sm">
-                + Tulis
-              </button>
-            )}
-          </nav>
-          {admin ? (
-            <button onClick={() => openNew()} className="btn-primary px-4 py-2 text-sm md:hidden">
-              + Tulis
-            </button>
-          ) : (
-            <button onClick={() => setView("senandika")} className="btn-ghost px-4 py-2 text-sm md:hidden">
-              Baca
-            </button>
-          )}
-        </div>
-      </header>
+      <SiteHeader
+        view={view}
+        go={setView}
+        theme={theme}
+        onTheme={() => setThemeState(theme === "dark" ? "light" : "dark")}
+        admin={admin}
+        onWrite={() => openNew()}
+      />
 
       {view === "landing" ? (
           <main className="pb-24 md:pb-8">
@@ -564,22 +526,26 @@ export default function App() {
 
         {(view === "senandika" || view === "favorit") && (
           <section className="fade-in mx-auto max-w-3xl">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="eyebrow">{view === "favorit" ? "Penanda pribadi" : "Senandika"}</p>
-                <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">{view === "favorit" ? "Favorit" : "Koleksi"}</h2>
+            <PageHero
+              pill={view === "favorit" ? "Penanda pribadi" : "Senandika"}
+              title={
+                view === "favorit" ? (
+                  <>Favorit <em className="font-playfair italic opacity-60">pilihan</em></>
+                ) : (
+                  <>Koleksi <em className="font-playfair italic opacity-60">tulisan</em></>
+                )
+              }
+              sub={
+                view === "favorit"
+                  ? "Tulisan yang kamu tandai di peramban ini."
+                  : "Cari cerita, kenangan, atau kata yang pernah tertulis di sini."
+              }
+            />
+            {admin && view !== "favorit" && (
+              <div className="mt-4 text-center">
+                <button onClick={() => openNew()} className="btn-primary px-5 py-2 text-sm">+ Tulis</button>
               </div>
-              {admin && (
-                <button onClick={() => openNew()} className="btn-primary hidden px-5 py-2 text-sm sm:block">+ Tulis</button>
-              )}
-            </div>
-            <p className="mt-2 text-sm opacity-70">
-              {view === "favorit"
-                ? "Tulisan yang kamu tandai di peramban ini."
-                : admin
-                  ? "Cari cerita, kenangan, atau kata yang pernah kamu tulis."
-                  : "Cari cerita, kenangan, atau kata yang pernah tertulis di sini."}
-            </p>
+            )}
             <div className="mt-4 flex gap-2">
               <input
                 className="input"
@@ -775,10 +741,12 @@ export default function App() {
 
         {view === "kenangan" && (
           <section className="fade-in mx-auto max-w-3xl">
-            <p className="eyebrow">Arsip momen</p>
-            <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Kenangan</h2>
-            <p className="mt-2 text-sm opacity-70">Cerita dan momen yang tidak ingin dilupakan.</p>
-            <p className="font-quote mt-3 text-xl italic opacity-80">
+            <PageHero
+              pill="Arsip momen"
+              title={<>Ruang <em className="font-playfair italic opacity-60">kenangan</em></>}
+              sub="Cerita dan momen yang tidak ingin dilupakan."
+            />
+            <p className="font-quote mt-3 text-center text-xl italic opacity-80">
               “Yang terlupakan, seolah tak pernah terjadi.”
             </p>
             {memories.length > 0 && (
@@ -814,21 +782,22 @@ export default function App() {
 
         {view === "timeline" && (
           <section className="fade-in mx-auto max-w-3xl">
-            <p className="eyebrow">Jejak waktu</p>
-            <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Timeline</h2>
-            <p className="mt-2 text-sm opacity-70">Perjalanan cerita berdasarkan waktu.</p>
+            <PageHero
+              pill="Jejak waktu"
+              title={<>Linimasa <em className="font-playfair italic opacity-60">cerita</em></>}
+              sub="Perjalanan cerita berdasarkan waktu."
+            />
             <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
           </section>
         )}
 
         {view === "kapsul" && (
           <section className="fade-in mx-auto max-w-3xl">
-            <p className="eyebrow">Kapsul waktu</p>
-            <h2 className="font-display mt-1 text-3xl font-medium md:text-4xl">Surat untuk Masa Depan</h2>
-            <p className="mt-2 text-sm opacity-70">
-              Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba.
-              Kapsul tersimpan di peramban ini saja.
-            </p>
+            <PageHero
+              pill="Kapsul waktu"
+              title={<>Surat masa <em className="font-playfair italic opacity-60">depan</em></>}
+              sub="Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba. Kapsul tersimpan di peramban ini saja."
+            />
             {admin && <CapsuleForm onAdd={(k) => setCapsules((p) => [k, ...p])} />}
             <div className="mt-6 grid gap-3">
               {[...capsules]

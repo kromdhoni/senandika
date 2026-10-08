@@ -1,15 +1,7 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import Typewriter from "../Typewriter";
 import type { View } from "../../types";
-
-const NAV: { id: View; label: string }[] = [
-  { id: "senandika", label: "Koleksi" },
-  { id: "kenangan", label: "Kenangan" },
-  { id: "timeline", label: "Timeline" },
-  { id: "kapsul", label: "Kapsul" },
-];
 
 export default function FinsycHeader({
   go,
@@ -20,7 +12,6 @@ export default function FinsycHeader({
   lines: string[];
   headLines: string[];
 }) {
-  const [ctaHover, setCtaHover] = useState(false);
   const base = import.meta.env.BASE_URL;
 
   return (
@@ -42,58 +33,9 @@ export default function FinsycHeader({
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 lg:pt-8">
-        <motion.nav
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" as const }}
-          className="flex items-center justify-between"
-          aria-label="Navigasi utama"
-        >
-          <button
-            onClick={() => window.scrollTo({ top: 0 })}
-            className="font-display text-lg font-semibold uppercase tracking-[0.24em] text-white"
-          >
-            Senandika
-          </button>
 
-          <ul className="hidden items-center gap-8 lg:flex">
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <button
-                  onClick={() => go(n.id)}
-                  className="font-inter text-base font-normal leading-6 tracking-[-0.3px] text-white/80 transition-all hover:font-bold hover:opacity-100"
-                >
-                  {n.label}
-                </button>
-              </li>
-            ))}
-          </ul>
 
-          <motion.button
-            onMouseEnter={() => setCtaHover(true)}
-            onMouseLeave={() => setCtaHover(false)}
-            layout
-            onClick={() => go("senandika")}
-            className={
-              "hidden h-11 cursor-pointer items-center gap-3 rounded-full border border-white/40 bg-white/10 py-1.5 backdrop-blur-sm transition-all duration-300 sm:flex " +
-              (ctaHover ? "flex-row-reverse pl-1.5 pr-[18px]" : "flex-row pl-[18px] pr-1.5")
-            }
-          >
-            <motion.span layout className="font-inter text-base font-medium leading-6 tracking-[-0.3px] text-white">
-              Mulai Membaca
-            </motion.span>
-            <motion.div layout className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
-              <motion.div
-                animate={{ x: ctaHover ? [-20, 0] : 0, opacity: ctaHover ? [0, 1] : 1 }}
-                transition={{ duration: 0.3, delay: ctaHover ? 0.1 : 0 }}
-              >
-                <ArrowUpRight className="h-3 w-3 text-[#0b1520]" />
-              </motion.div>
-            </motion.div>
-          </motion.button>
-        </motion.nav>
-
-        <div className="flex flex-col items-center pb-16 pt-12 lg:pt-[72px]">
+        <div className="flex flex-col items-center pb-16 pt-14 lg:pt-20">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
