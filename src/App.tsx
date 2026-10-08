@@ -546,7 +546,8 @@ export default function App() {
                 <button onClick={() => openNew()} className="btn-primary px-5 py-2 text-sm">+ Tulis</button>
               </div>
             )}
-            <div className="mt-4 flex gap-2">
+            <div className="band mt-6 p-4 sm:p-6">
+            <div className="flex gap-2">
               <input
                 className="input"
                 placeholder='Cari "ibu"'
@@ -576,7 +577,7 @@ export default function App() {
                   )}
                   <div className={featured ? "p-6 md:p-8" : "p-5"}>
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
-                    <span className={featured ? "font-display mt-1 block text-2xl md:text-3xl" : "font-display mt-1 block text-xl"}>{e.title || "Tanpa judul"}</span>
+                    <span className={featured ? "font-onest mt-1 block text-2xl font-semibold tracking-[-0.8px] md:text-3xl" : "font-onest mt-1 block text-xl font-semibold tracking-[-0.8px]"}>{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, limit)}{e.content.length > limit ? "…" : ""}</span>
                   </button>
                   <div className="mt-3 flex gap-3 text-sm">
@@ -598,6 +599,7 @@ export default function App() {
                   {admin && <button onClick={() => openNew()} className="btn-primary mt-4">Mulai Menulis</button>}
                 </div>
               )}
+            </div>
             </div>
           </section>
         )}
@@ -755,7 +757,8 @@ export default function App() {
               </p>
             )}
             {admin && <MemoryForm onAdd={(m) => setMemories((p) => [m, ...p])} />}
-            <div className="stagger mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="band mt-6 p-4 sm:p-6">
+            <div className="stagger grid gap-4 sm:grid-cols-2">
               {memories.map((m, i) => (
                 <div key={m.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
                   {m.photo ? (
@@ -765,7 +768,7 @@ export default function App() {
                   )}
                   <div className="p-5">
                     <p className="text-xs uppercase tracking-widest opacity-60">{m.memoryDate} {m.location ? `· ${m.location}` : ""}</p>
-                    <h3 className="font-display mt-1 text-xl">{m.title}</h3>
+                    <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{m.title}</h3>
                     <p className="mt-1 text-sm opacity-80">{m.story}</p>
                     {admin && <button onClick={() => setMemories((p) => p.filter((x) => x.id !== m.id))} className="mt-3 text-sm underline underline-offset-4">Hapus</button>}
                   </div>
@@ -777,6 +780,7 @@ export default function App() {
                 </p>
               )}
             </div>
+            </div>
           </section>
         )}
 
@@ -787,7 +791,9 @@ export default function App() {
               title={<>Linimasa <em className="font-playfair italic opacity-60">cerita</em></>}
               sub="Perjalanan cerita berdasarkan waktu."
             />
+            <div className="band mt-6 p-4 sm:p-6">
             <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
+            </div>
           </section>
         )}
 
@@ -799,14 +805,14 @@ export default function App() {
               sub="Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba. Kapsul tersimpan di peramban ini saja."
             />
             {admin && <CapsuleForm onAdd={(k) => setCapsules((p) => [k, ...p])} />}
-            <div className="mt-6 grid gap-3">
+            <div className="band mt-6 grid gap-3 p-4 sm:p-6">
               {[...capsules]
                 .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
                 .map((k) =>
                   isCapsuleOpen(k) ? (
                     <article key={k.id} className="card card-lift p-5">
                       <p className="eyebrow">Dibuka {formatDateLong(`${k.openDate}T00:00:00`)}</p>
-                      <h3 className="font-display mt-1 text-xl">{k.title}</h3>
+                      <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{k.title}</h3>
                       <p className="prose-read mt-2 whitespace-pre-wrap text-[1rem]" dir="auto">{k.message}</p>
                       {admin && (
                         <button onClick={() => setCapsules((p) => p.filter((x) => x.id !== k.id))} className="mt-3 text-sm underline underline-offset-4">
@@ -823,7 +829,7 @@ export default function App() {
                         </svg>
                         Terkunci · dibuka {formatDateLong(`${k.openDate}T00:00:00`)}
                       </p>
-                      <h3 className="font-display mt-1 text-xl">{k.title}</h3>
+                      <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{k.title}</h3>
                       <p className="mt-1 text-sm opacity-70">
                         {daysUntilOpen(k) <= 0 ? "Waktunya hampir tiba." : `${daysUntilOpen(k)} hari lagi.`} Ada pesan dari masa lalu menunggumu.
                       </p>
@@ -1550,7 +1556,7 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
                   {(e.title || "S").charAt(0)}
                 </span>
                 <span>
-                  <span className="font-display block text-lg">{e.title || "Tanpa judul"}</span>
+                  <span className="font-onest block text-lg font-semibold tracking-[-0.8px]">{e.title || "Tanpa judul"}</span>
                 </span>
               </button>
             ))}

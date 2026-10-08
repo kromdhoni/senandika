@@ -37,7 +37,7 @@
   --line: var(--color-linen);
   --text: var(--color-ink);
   --muted: var(--color-muted);
-  --radius: 16px;
+  --radius: 20px;
   --shadow-soft: none;
   --shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.22);
   color-scheme: light;
@@ -136,6 +136,33 @@ body::before {
 .card-lift:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lift);
+}
+
+/* Pita konten ala landing: kartu putih di atas tinted band */
+.band {
+  background: #f4f8fc;
+  border-radius: 32px;
+}
+
+.dark .band {
+  background: #101418;
+  border: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.band .card {
+  background: #ffffff;
+}
+
+.dark .band .card {
+  background: var(--surface);
+}
+
+.band .input {
+  background: #ffffff;
+}
+
+.dark .band .input {
+  background: #000000;
 }
 
 .input {
