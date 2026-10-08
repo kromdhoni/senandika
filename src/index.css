@@ -211,6 +211,51 @@ body::before {
   border-color: var(--accent);
 }
 
+.btn-mini {
+  border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--text);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-mini:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.tabbar {
+  display: inline-flex;
+  gap: 4px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 6px;
+  box-shadow: 0 1px 20px rgb(30 100 160 / 0.08);
+}
+
+.dark .tabbar {
+  background: #000000;
+}
+
+.tabbar button {
+  border-radius: 12px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.9rem;
+  opacity: 0.65;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.tabbar button.active {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  font-weight: 600;
+  opacity: 1;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;

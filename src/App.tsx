@@ -527,7 +527,7 @@ export default function App() {
 
         {(view === "senandika" || view === "favorit") && (
           <>
-          <section className="fade-in mx-auto max-w-3xl">
+          <section className="fade-in mx-auto max-w-5xl">
             <PageBackdrop />
             <PageHero
               tone="dark"
@@ -584,11 +584,11 @@ export default function App() {
                     <span className={featured ? "font-onest mt-1 block text-2xl font-semibold tracking-[-0.8px] md:text-3xl" : "font-onest mt-1 block text-xl font-semibold tracking-[-0.8px]"}>{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, limit)}{e.content.length > limit ? "…" : ""}</span>
                   </button>
-                  <div className="mt-3 flex gap-3 text-sm">
-                    <button onClick={() => toggleFav(e.id)} className="underline underline-offset-4" aria-label="Tandai favorit">
+                  <div className="mt-3 flex gap-2 text-sm">
+                    <button onClick={() => toggleFav(e.id)} className="btn-mini" aria-label="Tandai favorit">
                       {e.isFavorite ? "★ Favorit" : "☆ Tandai"}
                     </button>
-                    {admin && <button onClick={() => openEdit(e)} className="underline underline-offset-4">Ubah</button>}
+                    {admin && <button onClick={() => openEdit(e)} className="btn-mini">Ubah</button>}
                   </div>
                   </div>
                 </article>
@@ -749,7 +749,7 @@ export default function App() {
 
         {view === "kenangan" && (
           <>
-          <section className="fade-in mx-auto max-w-3xl">
+          <section className="fade-in mx-auto max-w-5xl">
             <PageBackdrop />
             <PageHero
               tone="dark"
@@ -765,7 +765,11 @@ export default function App() {
                 {memories.length} cerita{memorySpan}
               </p>
             )}
-            {admin && <MemoryForm onAdd={(m) => setMemories((p) => [m, ...p])} />}
+            {admin && (
+              <div className="mx-auto mt-6 max-w-2xl">
+                <MemoryForm onAdd={(m) => setMemories((p) => [m, ...p])} />
+              </div>
+            )}
             <div className="band mt-6 p-4 sm:p-6">
             <div className="stagger grid gap-4 sm:grid-cols-2">
               {memories.map((m, i) => (
@@ -779,7 +783,7 @@ export default function App() {
                     <p className="text-xs uppercase tracking-widest opacity-60">{m.memoryDate} {m.location ? `· ${m.location}` : ""}</p>
                     <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{m.title}</h3>
                     <p className="mt-1 text-sm opacity-80">{m.story}</p>
-                    {admin && <button onClick={() => setMemories((p) => p.filter((x) => x.id !== m.id))} className="mt-3 text-sm underline underline-offset-4">Hapus</button>}
+                    {admin && <button onClick={() => setMemories((p) => p.filter((x) => x.id !== m.id))} className="btn-mini mt-3">Hapus</button>}
                   </div>
                 </div>
               ))}
@@ -797,7 +801,7 @@ export default function App() {
 
         {view === "timeline" && (
           <>
-          <section className="fade-in mx-auto max-w-3xl">
+          <section className="fade-in mx-auto max-w-5xl">
             <PageBackdrop />
             <PageHero
               tone="dark"
@@ -806,7 +810,9 @@ export default function App() {
               sub="Perjalanan cerita berdasarkan waktu."
             />
             <div className="band mt-6 p-4 sm:p-6">
+            <div className="mx-auto max-w-2xl">
             <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
+            </div>
             </div>
           </section>
             <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
@@ -815,7 +821,7 @@ export default function App() {
 
         {view === "kapsul" && (
           <>
-          <section className="fade-in mx-auto max-w-3xl">
+          <section className="fade-in mx-auto max-w-5xl">
             <PageBackdrop />
             <PageHero
               tone="dark"
@@ -823,8 +829,12 @@ export default function App() {
               title={<>Surat masa <em className="font-playfair italic opacity-60">depan</em></>}
               sub="Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba. Kapsul tersimpan di peramban ini saja."
             />
-            {admin && <CapsuleForm onAdd={(k) => setCapsules((p) => [k, ...p])} />}
-            <div className="band mt-6 grid gap-3 p-4 sm:p-6">
+            {admin && (
+              <div className="mx-auto mt-6 max-w-2xl">
+                <CapsuleForm onAdd={(k) => setCapsules((p) => [k, ...p])} />
+              </div>
+            )}
+            <div className="band mx-auto mt-6 grid max-w-2xl gap-3 p-4 sm:p-6">
               {[...capsules]
                 .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
                 .map((k) =>
@@ -834,7 +844,7 @@ export default function App() {
                       <h3 className="font-onest mt-1 text-xl font-semibold tracking-[-0.8px]">{k.title}</h3>
                       <p className="prose-read mt-2 whitespace-pre-wrap text-[1rem]" dir="auto">{k.message}</p>
                       {admin && (
-                        <button onClick={() => setCapsules((p) => p.filter((x) => x.id !== k.id))} className="mt-3 text-sm underline underline-offset-4">
+                        <button onClick={() => setCapsules((p) => p.filter((x) => x.id !== k.id))} className="btn-mini mt-3">
                           Hapus
                         </button>
                       )}
@@ -1554,13 +1564,13 @@ function TimelineList({ entries, onOpen }: { entries: Entry[]; onOpen: (id: stri
   if (groups.length === 0) return <p className="mt-4 opacity-70">Belum ada cerita di sini.</p>;
   return (
     <div className="mt-6">
-      <div className="flex gap-2" role="tablist" aria-label="Tampilan timeline">
+      <div className="tabbar" role="tablist" aria-label="Tampilan timeline">
         <button role="tab" aria-selected={tab === "daftar"} onClick={() => setTab("daftar")}
-          className={`rounded-full border px-4 py-1 text-sm ${tab === "daftar" ? "font-semibold underline underline-offset-4" : "opacity-70"}`}>
+          className={tab === "daftar" ? "active" : ""}>
           Daftar
         </button>
         <button role="tab" aria-selected={tab === "kalender"} onClick={() => setTab("kalender")}
-          className={`rounded-full border px-4 py-1 text-sm ${tab === "kalender" ? "font-semibold underline underline-offset-4" : "opacity-70"}`}>
+          className={tab === "kalender" ? "active" : ""}>
           Kalender
         </button>
       </div>
