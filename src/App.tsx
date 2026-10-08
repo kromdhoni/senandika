@@ -10,8 +10,11 @@ import {
   type View,
 } from "./types";
 import { GAYA_PUISI } from "./data/gaya";
-import Reveal from "./components/Reveal";
-import Typewriter from "./components/Typewriter";
+import FinsycFeatures from "./components/landing/FinsycFeatures";
+import FinsycFooter from "./components/landing/FinsycFooter";
+import FinsycHeader from "./components/landing/FinsycHeader";
+import FinsycHowItWorks from "./components/landing/FinsycHowItWorks";
+import FinsycQuotes from "./components/landing/FinsycQuotes";
 import Waves from "./components/Waves";
 import {
   adminLogin,
@@ -107,36 +110,6 @@ export default function App() {
   const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
-  const [heroIdx, setHeroIdx] = useState(0);
-  const [spot] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(pointer: fine)").matches &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-
-  const greeting = useMemo(() => {
-    const n = new Date();
-    const h = n.getHours();
-    const part = h >= 4 && h < 11 ? "pagi" : h >= 11 && h < 15 ? "siang" : h >= 15 && h < 18 ? "sore" : "malam";
-    return `Selamat ${part} · ${n.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
-  }, []);
-
-  const heroPool = useMemo(() => entries.filter((e) => e.cover).slice(0, 12), [entries]);
-  const heroEntry = heroPool.length > 0 ? heroPool[heroIdx % heroPool.length] : null;
-
-  useEffect(() => {
-    if (view !== "landing" || heroPool.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = window.setInterval(() => setHeroIdx((i) => (i + 1) % heroPool.length), 5500);
-    return () => window.clearInterval(t);
-  }, [view, heroPool]);
-
-  function onHeroMove(e: { currentTarget: HTMLElement; clientX: number; clientY: number }) {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
-  }
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -496,112 +469,11 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 md:pb-16">
-        {view === "landing" && (
-          <section onMouseMove={onHeroMove} className="fade-in relative mx-auto max-w-5xl py-10 md:py-16">
-            {spot && <div className="spotlight" aria-hidden="true" />}
-            <div className="grid items-center gap-10 md:grid-cols-2">
-              <div className="text-center md:text-left">
-                <p className="eyebrow">{greeting}</p>
-                <h1 className="font-display mt-4 min-h-[2.6em] text-4xl font-medium md:text-6xl">
-                  <Typewriter lines={HERO_LINES} />
-                </h1>
-                <p className="mx-auto mt-5 max-w-xl text-lg opacity-80 md:mx-0">
-                  Senandika adalah rumah bagi surat, kenangan, dan doa. Ditulis dengan tenang, disimpan dengan kasih.
-                </p>
-                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:justify-start sm:justify-center">
-                  <button onClick={() => setView("senandika")} className="btn-primary">Mulai Membaca →</button>
-                  <button onClick={() => setView("tentang")} className="btn-ghost">Tentang Senandika</button>
-                </div>
-              </div>
-              <div className="relative mx-auto w-full max-w-sm px-6 pb-8 pt-4">
-                <div className="arch absolute inset-0" aria-hidden="true" />
-                <svg className="absolute -left-2 bottom-6 w-24 opacity-80" viewBox="0 0 100 140" fill="none" stroke="var(--leaf)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                  <path d="M50 130 C50 90 50 50 50 12" />
-                  <ellipse cx="34" cy="100" rx="14" ry="6" transform="rotate(-30 34 100)" fill="var(--leaf)" opacity="0.35" stroke="none" />
-                  <ellipse cx="66" cy="82" rx="14" ry="6" transform="rotate(30 66 82)" fill="var(--leaf)" opacity="0.35" stroke="none" />
-                  <ellipse cx="34" cy="62" rx="14" ry="6" transform="rotate(-30 34 62)" fill="var(--leaf)" opacity="0.35" stroke="none" />
-                  <ellipse cx="66" cy="42" rx="12" ry="5" transform="rotate(30 66 42)" fill="var(--leaf)" opacity="0.35" stroke="none" />
-                  <circle cx="50" cy="12" r="4" fill="var(--accent)" stroke="none" />
-                </svg>
-                {heroEntry ? (
-                  <>
-                    <button
-                      onClick={() => openEntry(heroEntry.id)}
-                      className="polaroid float-soft relative block w-full p-4 pt-9 text-left"
-                      aria-label={`Baca: ${heroEntry.title || "tanpa judul"}`}
-                    >
-                      <span className="tape" aria-hidden="true" />
-                      <img
-                        src={`${import.meta.env.BASE_URL}${heroEntry.cover}`}
-                        alt=""
-                        className="h-44 w-full rounded object-cover"
-                      />
-                      <p key={heroEntry.id} className="font-quote fade-in mt-3 text-xl italic">
-                        “{heroEntry.content.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 2).join(" / ")}”
-                      </p>
-                      <p className="mt-2 text-xs uppercase tracking-[0.2em] opacity-50">
-                        {heroEntry.title || "Tanpa judul"}
-                      </p>
-                    </button>
-                    <div className="mt-3 flex justify-center gap-1.5">
-                      {heroPool.map((e, i) => (
-                        <button
-                          key={e.id}
-                          onClick={() => setHeroIdx(i)}
-                          aria-label={`Foto ${i + 1}: ${e.title || "tanpa judul"}`}
-                          className="h-1.5 rounded-full"
-                          style={{
-                            width: i === heroIdx % heroPool.length ? "20px" : "6px",
-                            background:
-                              i === heroIdx % heroPool.length
-                                ? "var(--accent)"
-                                : "color-mix(in srgb, var(--muted) 40%, transparent)",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <div className="polaroid float-soft relative p-6 pt-9">
-                    <span className="tape" aria-hidden="true" />
-                    <p className="font-quote text-xl italic">
-                      “Beberapa hal tidak harus dikatakan, cukup dituliskan.”
-                    </p>
-                    <p className="mt-3 text-xs uppercase tracking-[0.2em] opacity-50">Senandika · catatan hari ini</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {marqueeLines.length > 0 && (
-              <div className="marquee mt-12" aria-label="Larik-larik puisi berjalan">
-                <div className="marquee-track">
-                  {[0, 1].map((copy) => (
-                    <div key={copy} className="flex shrink-0 items-center gap-8 pr-8" aria-hidden={copy === 1}>
-                      {marqueeLines.map((line) => (
-                        <span key={`${copy}-${line}`} className="font-display flex items-center gap-8 text-lg italic opacity-70">
-                          {line} <span style={{ color: "var(--accent)" }}>✦</span>
-                        </span>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {entries[0] && (
-              <button onClick={() => openEntry(entries[0].id)} className="card card-lift hero-frame float-soft mx-auto mt-14 block max-w-xl p-7 text-left">
-                <span className="quote-mark" aria-hidden="true">“</span>
-                <span className="font-display -mt-6 block text-2xl">{entries[0].title || "Tanpa judul"}</span>
-                <span className="mt-2 block text-sm opacity-70">
-                  {entries[0].content.slice(0, 140)}{entries[0].content.length > 140 ? "…" : ""}
-                </span>
-              </button>
-            )}
-
+      {view === "landing" ? (
+          <main className="pb-24 md:pb-8">
+            <FinsycHeader go={setView} lines={marqueeLines} headLines={HERO_LINES} />
             {padaHariIni.length > 0 && (
-              <Reveal className="mx-auto mt-12 max-w-3xl">
+              <div className="mx-auto max-w-3xl bg-white px-4 py-14">
                 <p className="eyebrow text-center">Pada hari ini</p>
                 <h2 className="font-display mt-1 text-center text-2xl font-medium md:text-3xl">
                   Tahun-tahun lalu
@@ -633,24 +505,16 @@ export default function App() {
                     );
                   })}
                 </div>
-              </Reveal>
-            )}
-
-            <Reveal>
-            <figure className="mx-auto mt-14 max-w-xl">
-              <blockquote className="font-display text-xl italic opacity-80 md:text-2xl">
-                “Tidak semua perasaan harus dikirim. Beberapa cukup dituliskan agar tidak hilang.”
-              </blockquote>
-              <div className="divider-orn mt-6" aria-hidden="true"><span>✦</span></div>
-              <div className="mt-8">
-                <button onClick={() => setView("senandika")} className="btn-primary">Jelajahi Koleksi →</button>
               </div>
-            </figure>
-            </Reveal>
-          </section>
-        )}
-
-        {view === "dashboard" && (
+            )}
+            <FinsycFeatures go={setView} />
+            <FinsycHowItWorks go={setView} />
+            <FinsycQuotes entries={entries} onOpen={(id) => openEntry(id)} />
+            <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+          </main>
+        ) : (
+          <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 md:pb-16">
+            {view === "dashboard" && (
           <section className="fade-in mx-auto max-w-3xl">
             <p className="eyebrow">Beranda</p>
             <h2 className="font-display mt-2 text-3xl font-medium md:text-4xl">
@@ -1103,7 +967,9 @@ export default function App() {
           </section>
         )}
       </main>
+      )}
 
+      {view !== "landing" && (
       <footer className="mx-auto max-w-5xl px-4 pb-28 md:pb-12">
         <div className="divider-orn" aria-hidden="true"><span>✦</span></div>
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
@@ -1121,6 +987,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      )}
 
       <nav className="fixed inset-x-0 bottom-0 z-10 border-t md:hidden" style={{ background: "var(--surface)" }} aria-label="Navigasi seluler">
         <div className="grid grid-cols-4 text-xs">

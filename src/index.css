@@ -20,6 +20,11 @@
   --font-serif-display: "Playfair Display", "Amiri", "Georgia", "Times New Roman", serif;
   --font-serif-quote: "Cormorant Garamond", "Amiri", "Georgia", serif;
   --font-sans-body: "Inter", "Amiri", system-ui, -apple-system, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-onest: "Onest", "Inter", system-ui, sans-serif;
+  --font-playfair: "Playfair Display", Georgia, serif;
+  --font-heading: "Onest", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
 }
 
 :root {
