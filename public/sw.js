@@ -1,6 +1,6 @@
 /* Senandika service worker: baca offline.
  * Naikkan CACHE saat merilis perubahan besar agar klien memuat ulang. */
-const CACHE = "senandika-v1";
+const CACHE = "senandika-v2";
 const CORE = ["./", "./index.html", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import NightMedia from "../NightMedia";
 import Typewriter from "../Typewriter";
 import type { View } from "../../types";
 
@@ -12,8 +13,6 @@ export default function FinsycHeader({
   lines: string[];
   headLines: string[];
 }) {
-  const base = import.meta.env.BASE_URL;
-
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -22,12 +21,7 @@ export default function FinsycHeader({
       className="relative w-full overflow-hidden"
     >
       <div className="absolute inset-0 z-0">
-        <img
-          src={`${base}covers/malam.jpg`}
-          alt=""
-          aria-hidden="true"
-          className="h-full w-full object-cover"
-        />
+        <NightMedia className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#0b1520]/72" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b1520]/60 via-transparent to-[var(--bg)]" />
       </div>
@@ -44,7 +38,7 @@ export default function FinsycHeader({
           >
             <Sparkles className="h-4 w-4 fill-white text-white" />
             <span className="font-inter text-sm font-medium text-white sm:text-base">
-              Ruang personal · privat · tenang
+              Puisi · Surat · Kenangan · Doa
             </span>
           </motion.div>
 
