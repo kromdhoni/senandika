@@ -15,6 +15,7 @@ import FinsycFooter from "./components/landing/FinsycFooter";
 import FinsycHeader from "./components/landing/FinsycHeader";
 import FinsycHowItWorks from "./components/landing/FinsycHowItWorks";
 import FinsycQuotes from "./components/landing/FinsycQuotes";
+import PageBackdrop from "./components/PageBackdrop";
 import PageHero from "./components/PageHero";
 import SiteHeader from "./components/landing/SiteHeader";
 import Waves from "./components/Waves";
@@ -525,8 +526,11 @@ export default function App() {
         )}
 
         {(view === "senandika" || view === "favorit") && (
+          <>
           <section className="fade-in mx-auto max-w-3xl">
+            <PageBackdrop />
             <PageHero
+              tone="dark"
               pill={view === "favorit" ? "Penanda pribadi" : "Senandika"}
               title={
                 view === "favorit" ? (
@@ -602,6 +606,8 @@ export default function App() {
             </div>
             </div>
           </section>
+            <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+            </>
         )}
 
         {view === "tulis" && !admin && (
@@ -742,17 +748,20 @@ export default function App() {
         )}
 
         {view === "kenangan" && (
+          <>
           <section className="fade-in mx-auto max-w-3xl">
+            <PageBackdrop />
             <PageHero
+              tone="dark"
               pill="Arsip momen"
               title={<>Ruang <em className="font-playfair italic opacity-60">kenangan</em></>}
               sub="Cerita dan momen yang tidak ingin dilupakan."
             />
-            <p className="font-quote mt-3 text-center text-xl italic opacity-80">
+            <p className="font-quote mt-3 text-center text-xl italic text-white/85">
               “Yang terlupakan, seolah tak pernah terjadi.”
             </p>
             {memories.length > 0 && (
-              <p className="mt-2 text-xs uppercase tracking-[0.2em] opacity-50">
+              <p className="mt-2 text-center text-xs uppercase tracking-[0.2em] text-white/60">
                 {memories.length} cerita{memorySpan}
               </p>
             )}
@@ -782,11 +791,16 @@ export default function App() {
             </div>
             </div>
           </section>
+            <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+            </>
         )}
 
         {view === "timeline" && (
+          <>
           <section className="fade-in mx-auto max-w-3xl">
+            <PageBackdrop />
             <PageHero
+              tone="dark"
               pill="Jejak waktu"
               title={<>Linimasa <em className="font-playfair italic opacity-60">cerita</em></>}
               sub="Perjalanan cerita berdasarkan waktu."
@@ -795,11 +809,16 @@ export default function App() {
             <TimelineList entries={entries} onOpen={(id) => openEntry(id)} />
             </div>
           </section>
+            <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+            </>
         )}
 
         {view === "kapsul" && (
+          <>
           <section className="fade-in mx-auto max-w-3xl">
+            <PageBackdrop />
             <PageHero
+              tone="dark"
               pill="Kapsul waktu"
               title={<>Surat masa <em className="font-playfair italic opacity-60">depan</em></>}
               sub="Tulis pesan untuk dirimu di masa depan. Dibuka kembali saat waktunya tiba. Kapsul tersimpan di peramban ini saja."
@@ -843,6 +862,8 @@ export default function App() {
               )}
             </div>
           </section>
+            <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+            </>
         )}
 
         {view === "tentang" && (
@@ -944,7 +965,7 @@ export default function App() {
       </main>
       )}
 
-      {view !== "landing" && (
+      {["tulis", "baca", "tentang", "pengaturan"].includes(view) && (
       <footer className="mx-auto max-w-5xl px-4 pb-28 md:pb-12">
         <div className="divider-orn" aria-hidden="true"><span>✦</span></div>
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
