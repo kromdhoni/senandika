@@ -968,6 +968,7 @@ export default function App() {
                 }}
               />
             ) : (
+              <>
               <div className="card mt-4 border p-6" style={{ borderColor: "color-mix(in srgb, var(--accent) 55%, transparent)" }}>
                 <h3 className="font-display text-xl">Mode admin aktif.</h3>
                 <p className="mt-1 text-sm opacity-70">
@@ -1013,6 +1014,7 @@ export default function App() {
                   </div>
                 </div>
               )}
+              </>
             )}
             <div className="card mt-4 p-6">
               <h3 className="font-semibold">Tema</h3>
