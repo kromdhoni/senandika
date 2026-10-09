@@ -92,16 +92,30 @@ export default function FinsycFooter({
           </nav>
         </div>
 
-        <div className="w-full select-none overflow-hidden" aria-hidden="true">
-          <motion.p
+        <div className="w-full select-none" aria-hidden="true">
+          <motion.div
             initial={{ y: "40%", opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease: "easeOut" as const }}
-            className="font-display w-full text-center text-[22vw] font-bold leading-[0.95] tracking-tight text-white/[0.07] lg:text-[240px]"
           >
-            SENANDIKA
-          </motion.p>
+            <svg viewBox="0 0 1000 170" className="block w-full" role="img" aria-label="Senandika">
+              <text
+                x="500"
+                y="132"
+                textAnchor="middle"
+                fontFamily="'Playfair Display', Georgia, serif"
+                fontWeight="700"
+                fontSize="148"
+                letterSpacing="4"
+                textLength="960"
+                lengthAdjust="spacingAndGlyphs"
+                fill="rgba(255,255,255,0.07)"
+              >
+                SENANDIKA
+              </text>
+            </svg>
+          </motion.div>
         </div>
 
         <div className="flex w-full flex-col items-center justify-between gap-3 border-t border-white/10 py-6 sm:flex-row">
