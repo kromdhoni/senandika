@@ -23,7 +23,12 @@ export default function FinsycHeader({
       <div className="absolute inset-0 z-0">
         <NightMedia className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#0b1520]/72" />
+        <div className="aurora-a absolute -left-24 top-1/4 h-96 w-96 rounded-full bg-[#2e86c1]/25 blur-[100px]" aria-hidden="true" />
+        <div className="aurora-b absolute -right-24 top-1/2 h-[28rem] w-[28rem] rounded-full bg-[#6bb8e8]/15 blur-[110px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b1520]/60 via-transparent to-[var(--bg)]" />
+        <span className="twinkle absolute left-[12%] top-[22%] text-xl text-white/70" style={{ animationDelay: "0s" }} aria-hidden="true">✦</span>
+        <span className="twinkle absolute right-[14%] top-[32%] text-sm text-white/60" style={{ animationDelay: "1.2s" }} aria-hidden="true">✦</span>
+        <span className="twinkle absolute bottom-[28%] left-[22%] text-base text-white/50" style={{ animationDelay: "2.1s" }} aria-hidden="true">✦</span>
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 lg:pt-8">

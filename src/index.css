@@ -290,6 +290,65 @@ body::before {
   opacity: 1;
 }
 
+/* Pemanis gerak: aurora, kilau, sentuhan tekan, zoom foto */
+.aurora-a {
+  animation: drift1 16s ease-in-out infinite alternate;
+}
+
+.aurora-b {
+  animation: drift2 20s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(60px, 30px) scale(1.15);
+  }
+}
+
+@keyframes drift2 {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+  to {
+    transform: translate(-50px, -30px) scale(1);
+  }
+}
+
+.twinkle {
+  animation: twinkle 3.5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+.btn-primary:active,
+.btn-ghost:active,
+.btn-mini:active,
+.icon-btn:active,
+.fab-center:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-a,
+  .aurora-b,
+  .twinkle {
+    animation: none !important;
+  }
+}
+
 .chip {
   display: inline-flex;
   align-items: center;

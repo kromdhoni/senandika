@@ -592,7 +592,7 @@ export default function App() {
                       src={`${import.meta.env.BASE_URL}${e.cover}`}
                       alt=""
                       loading="lazy"
-                      className={featured ? "h-56 w-full object-cover sm:h-72" : "h-36 w-full object-cover"}
+                      className={featured ? "h-56 w-full object-cover transition-transform duration-700 hover:scale-[1.03] sm:h-72" : "h-36 w-full object-cover transition-transform duration-700 hover:scale-[1.04]"}
                     />
                   ) : (
                     <div className="cover-band" style={{ background: TYPE_COVER[e.type] }} aria-hidden="true" />
@@ -795,7 +795,7 @@ export default function App() {
               {memories.map((m, i) => (
                 <div key={m.id} className="card card-lift overflow-hidden" style={{ ["--i" as string]: Math.min(i, 6) }}>
                   {m.photo ? (
-                    <img src={m.photo.startsWith("data:") ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`} alt="" loading="lazy" className="h-44 w-full object-cover" />
+                    <img src={m.photo.startsWith("data:") ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`} alt="" loading="lazy" className="h-44 w-full object-cover transition-transform duration-700 hover:scale-[1.03]" />
                   ) : (
                     <div className="h-1.5" style={{ background: "linear-gradient(to right, var(--accent), transparent)" }} />
                   )}
