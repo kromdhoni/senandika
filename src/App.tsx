@@ -131,6 +131,7 @@ export default function App() {
   const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
+  const [preview, setPreview] = useState(false);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -200,6 +201,7 @@ export default function App() {
       return;
     }
     setSheetOpen(false);
+    setPreview(false);
     setDraft({ ...emptyDraft(), type: preset });
     setSaveState("idle");
     setView("tulis");
@@ -207,6 +209,7 @@ export default function App() {
 
   function openEdit(e: Entry) {
     if (!admin) return;
+    setPreview(false);
     setDraft({ ...e });
     setSaveState("idle");
     setView("tulis");
@@ -340,6 +343,16 @@ export default function App() {
   const olderEntry = activeIndex >= 0 && activeIndex < sortedAll.length - 1 ? sortedAll[activeIndex + 1] : null;
 
   const favList = filtered.filter((e) => e.isFavorite);
+
+  const drafts = useMemo(() => entries.filter((e) => e.status === "draft"), [entries]);
+
+  const draftStats = useMemo(() => {
+    const t = draft.content.trim();
+    return {
+      words: t ? t.split(/\s+/).length : 0,
+      lines: draft.content ? draft.content.split("\n").length : 0,
+    };
+  }, [draft.content]);
 
   const padaHariIni = useMemo(() => {
     const now = new Date();
@@ -604,6 +617,9 @@ export default function App() {
                   <button className="block w-full text-left" onClick={() => openEntry(e.id)}>
                     <span className={featured ? "font-onest mt-1 block text-2xl font-semibold tracking-[-0.8px] md:text-3xl" : "font-onest mt-1 block text-xl font-semibold tracking-[-0.8px]"}>{e.title || "Tanpa judul"}</span>
                     <span className="mt-1 block text-sm opacity-70">{e.content.slice(0, limit)}{e.content.length > limit ? "…" : ""}</span>
+                    {admin && e.status === "draft" && (
+                      <span className="chip mt-2">Draft · tersimpan otomatis</span>
+                    )}
                   </button>
                   <div className="mt-3 flex gap-2 text-sm">
                     <button onClick={() => toggleFav(e.id)} className="btn-mini" aria-label="Tandai favorit">
@@ -663,6 +679,18 @@ export default function App() {
                 </select>
               </label>
             </div>
+            <div className="mt-4 flex items-center justify-between text-sm opacity-70">
+              <span>{draftStats.words} kata · {draftStats.lines} baris</span>
+              <button onClick={() => setPreview((p) => !p)} className="underline underline-offset-4">
+                {preview ? "Lanjut menulis" : "Pratinjau"}
+              </button>
+            </div>
+            {preview ? (
+              <div className="card prose-read mt-4 min-h-[320px] whitespace-pre-wrap p-6" dir="auto">
+                {draft.title && <p className="font-display mb-4 text-2xl">{draft.title}</p>}
+                {draft.content || "Belum ada tulisan."}
+              </div>
+            ) : (
             <textarea
               className="input prose-read mt-4 min-h-[320px]"
               placeholder={draft.type === "POEM" ? "tulis dengan huruf kecil…\nbiarkan satu kata berat\nberdiri sendiri." : "Tuliskan di sini…"}
@@ -670,6 +698,7 @@ export default function App() {
               onChange={(e) => setDraft({ ...draft, content: e.target.value })}
               aria-label="Isi tulisan"
             />
+            )}
             {draft.type === "POEM" && (
               <details className="card mt-3 p-5 text-sm">
                 <summary className="font-display cursor-pointer text-lg">{GAYA_PUISI.judul} · referensi gayamu</summary>
@@ -962,6 +991,28 @@ export default function App() {
                   </button>
                 </div>
               </div>
+              <div className="card mt-4 p-6">
+                <h3 className="font-display text-xl">Cara menerbitkan</h3>
+                <ol className="mt-2 list-decimal space-y-2 pl-6 text-sm opacity-85">
+                  <li>Tulis atau ubah seperti biasa. Semuanya tersimpan otomatis di peramban ini.</li>
+                  <li>Tekan <strong>Export file publikasi</strong>, ganti isi <code>src/data/published.ts</code> di repo dengan file itu, lalu push. Deploy berjalan otomatis.</li>
+                  <li>Untuk tulisan <strong>baru</strong>, beri tahu saya agar dibuatkan kartu share-nya sebelum push.</li>
+                  <li>Kapsul dan foto kenangan upload tetap di peramban dan tidak ikut terbit.</li>
+                </ol>
+              </div>
+              {drafts.length > 0 && (
+                <div className="card mt-4 p-6">
+                  <h3 className="font-display text-xl">Lanjutkan draft ({drafts.length})</h3>
+                  <div className="mt-3 space-y-2">
+                    {drafts.map((d) => (
+                      <button key={d.id} onClick={() => openEdit(d)} className="card card-lift block w-full p-3 text-left">
+                        <span className="font-display">{d.title || "Tanpa judul"}</span>
+                        <span className="block text-xs opacity-60">{d.content.slice(0, 80)}{d.content.length > 80 ? "…" : ""}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             )}
             <div className="card mt-4 p-6">
               <h3 className="font-semibold">Tema</h3>
