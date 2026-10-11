@@ -1461,9 +1461,12 @@ async function renderQuoteCard(entry: Entry, coverUrl: string | null): Promise<B
     ctx.fillText(ln, pad, y);
   }
 
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = "600 30px Inter, sans-serif";
-  ctx.fillText("S E N A N D I K A", pad, H - 96);
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.font = 'italic 500 42px "Cormorant Garamond", Georgia, serif';
+  ctx.textAlign = "right";
+  ctx.fillText("– tulisan seseorang,", W - pad, H - 152);
+  ctx.fillText("semoga Allah menjaganya.", W - pad, H - 96);
+  ctx.textAlign = "left";
 
   return new Promise((res, rej) => {
     cv.toBlob((b) => (b ? res(b) : rej(new Error("gagal merender"))), "image/png");
