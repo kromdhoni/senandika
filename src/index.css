@@ -261,6 +261,22 @@ body::before {
   color: color-mix(in srgb, var(--muted) 80%, transparent);
 }
 
+/* Bintang redup untuk menemani membaca di mode gelap */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgb(255 255 255 / 0.55), transparent),
+    radial-gradient(1px 1px at 32% 68%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 52% 12%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1px 1px at 68% 42%, rgb(255 255 255 / 0.45), transparent),
+    radial-gradient(1px 1px at 82% 78%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 90% 18%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1px 1px at 8% 82%, rgb(255 255 255 / 0.45), transparent),
+    radial-gradient(1px 1px at 44% 88%, rgb(255 255 255 / 0.4), transparent);
+}
+
 .tabbar {
   display: inline-flex;
   gap: 4px;
@@ -543,6 +559,7 @@ body::before {
   nav,
   .marquee,
   .waves-bg,
+  .stars,
   .sheet-overlay,
   .sheet,
   .no-print {

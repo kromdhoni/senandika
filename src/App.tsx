@@ -391,6 +391,7 @@ export default function App() {
     return (
       <div className="min-h-screen" style={{ background: "var(--bg)" }}>
         <ReadingProgress />
+        {theme === "dark" && <div className="stars" aria-hidden="true" />}
         <div className="no-print mx-auto flex max-w-2xl items-center justify-between gap-2 px-5 py-4">
           <IconBtn label="Kembali" onClick={() => setImmersive(false)}>
             {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
@@ -413,6 +414,8 @@ export default function App() {
           </h1>
           <p className="mt-3 text-center text-sm opacity-60">
             {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+            {" · "}
+            {Math.max(1, Math.round((active.content.trim() ? active.content.trim().split(/\s+/).length : 0) / 200))} menit baca
           </p>
           <div className="divider-orn my-8" aria-hidden="true"><span>✦</span></div>
           <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
@@ -735,6 +738,7 @@ export default function App() {
         {view === "baca" && active && (
           <article className="fade-in mx-auto max-w-3xl">
             <ReadingProgress />
+            {theme === "dark" && <div className="stars" aria-hidden="true" />}
             <div className="no-print mb-4">
               <IconBtn label="Kembali ke Koleksi" onClick={() => setView("senandika")}>
                 {strokeIcon("M19 12H5M12 19l-7-7 7-7")}
@@ -743,6 +747,8 @@ export default function App() {
             <h2 className="font-display mt-2 text-4xl font-medium md:text-5xl">{active.title || "Tanpa judul"}</h2>
             <p className="mt-3 text-sm opacity-60">
               {new Date(active.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+              {" · "}
+              {Math.max(1, Math.round((active.content.trim() ? active.content.trim().split(/\s+/).length : 0) / 200))} menit baca
             </p>
             <div className="divider-orn my-6" aria-hidden="true"><span>✦</span></div>
             <div className="prose-read dropcap whitespace-pre-wrap" dir="auto" style={proseStyle}>{active.content}</div>
@@ -786,6 +792,26 @@ export default function App() {
               {admin && <button onClick={() => openEdit(active)} className="btn-ghost text-sm">Ubah</button>}
               {admin && <button onClick={() => removeEntry(active.id)} className="btn-ghost text-sm">Hapus</button>}
             </div>
+            {olderEntry && (
+              <button onClick={() => openEntry(olderEntry.id)} className="card card-lift mt-10 flex w-full items-center gap-4 overflow-hidden p-4 text-left">
+                {olderEntry.cover ? (
+                  <img
+                    src={`${import.meta.env.BASE_URL}${olderEntry.cover}`}
+                    alt=""
+                    loading="lazy"
+                    className="h-20 w-20 flex-none rounded-xl object-cover"
+                  />
+                ) : (
+                  <span className="mono-thumb" style={{ background: TYPE_COVER[olderEntry.type] }} aria-hidden="true">
+                    {(olderEntry.title || "S").charAt(0)}
+                  </span>
+                )}
+                <span>
+                  <span className="eyebrow">Lanjut membaca</span>
+                  <span className="font-onest mt-1 block text-lg font-semibold leading-snug">{olderEntry.title || "Tanpa judul"}</span>
+                </span>
+              </button>
+            )}
           </article>
         )}
 

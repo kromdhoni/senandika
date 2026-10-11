@@ -117,7 +117,7 @@ export function uid(prefix: string) {
 
 export function getTheme(): "light" | "dark" {
   const v = localStorage.getItem(THEME_KEY);
-  return v === "dark" ? "dark" : "light";
+  return v === "light" ? "light" : "dark";
 }
 
 export function setTheme(v: "light" | "dark") {
