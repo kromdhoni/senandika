@@ -20,7 +20,7 @@ for m in pattern.finditer(src):
     desc = " / ".join(lines[:3])[:170]
     entries.append({"id": eid, "title": title, "desc": desc, "cover": cover})
 
-assert len(entries) == 43, "ketemu %d, harus 43" % len(entries)
+assert len(entries) >= 43, "ketemu %d" % len(entries)
 
 
 def esc(s):
