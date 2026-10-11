@@ -13,6 +13,8 @@ export const ADMIN_PIN = "Oyisam21";
 const KEY = "senandika.v5";
 const THEME_KEY = "senandika.theme";
 const ADMIN_KEY = "senandika.admin";
+const REV_KEY = "senandika.rev";
+const DATA_REV = 2;
 
 interface Persisted {
   entries: Entry[];
@@ -63,6 +65,32 @@ export function load(): Persisted {
         fresh.capsules,
       ),
     };
+    // revisi konten publikasi (mis. tanggal baru): tempel ke item lama,
+    // favorit dan tulisan lokal tetap dipertahankan. Tanpa reset.
+    let rev = DATA_REV;
+    try {
+      rev = Number(localStorage.getItem(REV_KEY) ?? DATA_REV);
+    } catch {
+      /* abaikan */
+    }
+    if (rev < DATA_REV) {
+      const patch = <T extends { id: string }>(items: T[], pub: T[], keep: (keyof T)[]) =>
+        items.map((it) => {
+          const p = pub.find((x) => x.id === it.id);
+          if (!p) return it;
+          const kept = {} as Partial<T>;
+          for (const k of keep) kept[k] = it[k];
+          return { ...p, ...kept };
+        });
+      merged.entries = patch(merged.entries, fresh.entries, ["isFavorite"]);
+      merged.memories = patch(merged.memories, fresh.memories, []);
+      merged.capsules = patch(merged.capsules, fresh.capsules, []);
+      try {
+        localStorage.setItem(REV_KEY, String(DATA_REV));
+      } catch {
+        /* abaikan */
+      }
+    }
     // versi lokal menang; yang hilang dari publikasi ditambahkan tanpa reset
     localStorage.setItem(KEY, JSON.stringify(merged));
     return merged;
