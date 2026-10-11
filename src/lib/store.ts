@@ -67,11 +67,13 @@ export function load(): Persisted {
     };
     // revisi konten publikasi (mis. tanggal baru): tempel ke item lama,
     // favorit dan tulisan lokal tetap dipertahankan. Tanpa reset.
-    let rev = DATA_REV;
+    let rev = 1;
     try {
-      rev = Number(localStorage.getItem(REV_KEY) ?? DATA_REV);
+      const stored = localStorage.getItem(REV_KEY);
+      rev = stored === null ? 1 : Number(stored);
+      if (!Number.isFinite(rev)) rev = 1;
     } catch {
-      /* abaikan */
+      rev = 1;
     }
     if (rev < DATA_REV) {
       const patch = <T extends { id: string }>(items: T[], pub: T[], keep: (keyof T)[]) =>
