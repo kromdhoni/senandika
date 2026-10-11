@@ -1580,6 +1580,13 @@ function BookView({
   });
 
   const e = list[idx];
+  const [opened, setOpened] = useState(false);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setOpened(true), 80);
+    return () => window.clearTimeout(t);
+  }, []);
+
   if (!e) {
     return (
       <div className="card mx-auto max-w-xl p-8 text-center">
@@ -1601,40 +1608,46 @@ function BookView({
         <span className="w-[38px]" aria-hidden="true" />
       </div>
 
-      <div style={{ perspective: 1600 }}>
-        <AnimatePresence mode="wait" initial={false}>
+      <div style={{ perspective: 2200 }}>
+      <motion.div
+        initial={{ rotateY: -62, opacity: 0, scale: 0.94 }}
+        animate={opened ? { rotateY: 0, opacity: 1, scale: 1 } : {}}
+        transition={{ duration: reduce ? 0 : 1.4, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transformStyle: "preserve-3d" }}
+      >
+      <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={e.id}
             className="book-spread"
             initial={{ opacity: 0, rotateY: dir >= 0 ? 10 : -10, x: dir * 48 }}
             animate={{ opacity: 1, rotateY: 0, x: 0 }}
             exit={{ opacity: 0, rotateY: dir >= 0 ? -10 : 10, x: dir * -48 }}
-            transition={{ duration: reduce ? 0 : 0.45, ease: "easeOut" }}
+            transition={{ duration: reduce ? 0 : 0.55, ease: "easeOut" }}
           >
             <div className="book-page">
               {e.cover && (
                 <img
                   src={`${import.meta.env.BASE_URL}${e.cover}`}
                   alt=""
-                  className="h-48 w-full rounded-xl object-cover sm:h-56"
+                  className="h-52 w-full rounded-xl object-cover sm:h-64"
                 />
               )}
-              <h3 className="font-display mt-4 text-2xl font-medium sm:text-3xl">
+              <h3 className="font-display mt-5 text-center text-2xl font-medium sm:text-3xl">
                 {e.title || "Tanpa judul"}
               </h3>
-              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-black/50">
+              <p className="mt-2 text-center text-xs uppercase tracking-[0.2em] text-black/50">
                 {new Date(e.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
               </p>
-              <p className="font-display mt-6 text-sm italic text-black/50">Senandika.</p>
             </div>
             <div className="book-spine" aria-hidden="true" />
-            <div className="book-page">
+            <div className="book-page book-right">
               <div className="book-text" dir="auto">
                 {e.content}
               </div>
             </div>
           </motion.div>
         </AnimatePresence>
+      </motion.div>
       </div>
 
       <div className="mt-6 flex items-center justify-between gap-3">

@@ -343,11 +343,20 @@ body::before {
 
 .book-text {
   white-space: pre-wrap;
-  line-height: 1.9;
-  font-size: 1.05rem;
+  font-family: var(--font-serif-quote);
+  font-style: italic;
+  font-size: clamp(1.2rem, 1rem + 1.2vw, 1.45rem);
+  line-height: 2;
+  text-align: center;
   max-height: 58vh;
   overflow-y: auto;
   padding-right: 0.5rem;
+}
+
+.book-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .book-text::-webkit-scrollbar {
