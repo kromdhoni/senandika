@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   Feather,
@@ -128,6 +129,9 @@ export default function App() {
   const [admin, setAdmin] = useState(isAdmin());
   const [immersive, setImmersive] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [bookList, setBookList] = useState<Entry[]>([]);
+  const [bookIdx, setBookIdx] = useState(0);
+  const [bookDir, setBookDir] = useState(1);
   const [quoteFor, setQuoteFor] = useState<Entry | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(loadFontScale);
@@ -242,6 +246,20 @@ export default function App() {
     const pool = view === "favorit" ? favList : filtered;
     if (pool.length === 0) return;
     openEntry(pool[Math.floor(Math.random() * pool.length)].id);
+  }
+
+  function openBook() {
+    const pool = view === "favorit" ? favList : filtered;
+    if (pool.length === 0) return;
+    setBookList(pool);
+    setBookIdx(0);
+    setBookDir(1);
+    setView("buku");
+  }
+
+  function bookGo(d: number) {
+    setBookDir(d);
+    setBookIdx((i) => (i + d + bookList.length) % bookList.length);
   }
 
   function handleReset() {
@@ -455,7 +473,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      {["senandika", "favorit", "kenangan", "timeline", "kapsul"].includes(view) && <PageBackdrop />}
+      {["senandika", "favorit", "kenangan", "timeline", "kapsul", "buku"].includes(view) && <PageBackdrop />}
       <SiteHeader
         view={view}
         go={setView}
@@ -595,6 +613,9 @@ export default function App() {
               <IconBtn label="Kocok: buka tulisan acak" onClick={shuffle}>
                 {strokeIcon("M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5")}
               </IconBtn>
+              <IconBtn label="Mode buku" onClick={openBook}>
+                {strokeIcon("M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5z")}
+              </IconBtn>
             </div>
             <div className="stagger mt-6 grid gap-4 sm:grid-cols-2">
               {(view === "favorit" ? favList : filtered).map((e, i) => {
@@ -648,6 +669,22 @@ export default function App() {
           </section>
             <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
             </>
+        )}
+
+        {view === "buku" && (
+          <>
+          <section className="fade-in mx-auto w-full max-w-4xl">
+            <BookView
+              list={bookList}
+              idx={bookIdx}
+              dir={bookDir}
+              onPrev={() => bookGo(-1)}
+              onNext={() => bookGo(1)}
+              onClose={() => setView("senandika")}
+            />
+          </section>
+          <FinsycFooter go={setView} onAdmin={() => setView("pengaturan")} />
+          </>
         )}
 
         {view === "tulis" && !admin && (
@@ -1509,6 +1546,106 @@ function QuoteCardModal({ entry, onClose }: { entry: Entry; onClose: () => void 
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function BookView({
+  list,
+  idx,
+  dir,
+  onPrev,
+  onNext,
+  onClose,
+}: {
+  list: Entry[];
+  idx: number;
+  dir: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}) {
+  const reduce =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    const keys = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") onPrev();
+      else if (e.key === "ArrowRight") onNext();
+      else if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", keys);
+    return () => window.removeEventListener("keydown", keys);
+  });
+
+  const e = list[idx];
+  if (!e) {
+    return (
+      <div className="card mx-auto max-w-xl p-8 text-center">
+        <p className="font-display text-xl">Buku ini kosong.</p>
+        <button onClick={onClose} className="btn-primary mt-4">Kembali</button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between text-sm">
+        <IconBtn label="Tutup buku" onClick={onClose}>
+          {strokeIcon("M18 6L6 18M6 6l12 12")}
+        </IconBtn>
+        <p className="text-white/70">
+          Halaman {idx + 1} dari {list.length}
+        </p>
+        <span className="w-[38px]" aria-hidden="true" />
+      </div>
+
+      <div style={{ perspective: 1600 }}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={e.id}
+            className="book-spread"
+            initial={{ opacity: 0, rotateY: dir >= 0 ? 10 : -10, x: dir * 48 }}
+            animate={{ opacity: 1, rotateY: 0, x: 0 }}
+            exit={{ opacity: 0, rotateY: dir >= 0 ? -10 : 10, x: dir * -48 }}
+            transition={{ duration: reduce ? 0 : 0.45, ease: "easeOut" }}
+          >
+            <div className="book-page">
+              {e.cover && (
+                <img
+                  src={`${import.meta.env.BASE_URL}${e.cover}`}
+                  alt=""
+                  className="h-48 w-full rounded-xl object-cover sm:h-56"
+                />
+              )}
+              <h3 className="font-display mt-4 text-2xl font-medium sm:text-3xl">
+                {e.title || "Tanpa judul"}
+              </h3>
+              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-black/50">
+                {new Date(e.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+              </p>
+              <p className="font-display mt-6 text-sm italic text-black/50">Senandika.</p>
+            </div>
+            <div className="book-spine" aria-hidden="true" />
+            <div className="book-page">
+              <div className="book-text" dir="auto">
+                {e.content}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <button onClick={onPrev} className="btn-ghost px-5 py-2 text-sm" style={{ color: "#fff", borderColor: "rgb(255 255 255 / 0.35)" }}>
+          ← Sebelumnya
+        </button>
+        <button onClick={onNext} className="btn-primary px-5 py-2 text-sm">
+          Berikutnya →
+        </button>
+      </div>
+      <p className="mt-3 text-center text-xs text-white/50">Gunakan tombol atau panah keyboard untuk membalik halaman</p>
     </div>
   );
 }

@@ -306,6 +306,58 @@ body::before {
   opacity: 1;
 }
 
+/* Mode buku: hamparan dua halaman kertas */
+.book-spread {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fbf7ef;
+  color: #292421;
+  box-shadow:
+    0 40px 80px -30px rgb(0 0 0 / 0.55),
+    0 2px 8px rgb(0 0 0 / 0.3);
+  transform-style: preserve-3d;
+}
+
+@media (min-width: 640px) {
+  .book-spread {
+    grid-template-columns: 1fr 10px 1.5fr;
+  }
+}
+
+.book-page {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.book-spine {
+  display: none;
+  background: linear-gradient(to right, transparent, rgb(0 0 0 / 0.22), transparent);
+}
+
+@media (min-width: 640px) {
+  .book-spine {
+    display: block;
+  }
+}
+
+.book-text {
+  white-space: pre-wrap;
+  line-height: 1.9;
+  font-size: 1.05rem;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.book-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.book-text::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 0.2);
+}
+
 /* Pemanis gerak: aurora, kilau, sentuhan tekan, zoom foto */
 .aurora-a {
   animation: drift1 16s ease-in-out infinite alternate;

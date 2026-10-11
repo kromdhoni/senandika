@@ -61,6 +61,7 @@ export type View =
   | "senandika"
   | "tulis"
   | "baca"
+  | "buku"
   | "kenangan"
   | "timeline"
   | "favorit"
